@@ -1,5 +1,5 @@
 <h1 align="center">
-    <img src="https://alibaba.github.io/libgrape-lite/logo.png" width="100" alt="libgrape-lite">
+    <img src="https://alibaba.github.io/libgrape-lite/logo.png" width="100" alt="libgrape-lite-logo">
     <br>
     libgrape-lite
 </h1>
