@@ -41,17 +41,19 @@ class WCCAuto : public AutoAppBase<FRAG_T, WCCAutoContext<FRAG_T>> {
  public:
   INSTALL_AUTO_WORKER(WCCAuto<FRAG_T>, WCCAutoContext<FRAG_T>, FRAG_T)
   using vertex_t = typename fragment_t::vertex_t;
+  using vid_t = typename fragment_t::vid_t;
+  using cid_t = typename WCCAutoContext<FRAG_T>::cid_t;
 
   void PEval(const fragment_t& frag, context_t& ctx) {
     auto inner_vertices = frag.InnerVertices();
     auto outer_vertices = frag.OuterVertices();
     auto vertices = frag.Vertices();
 
-    VertexArray<bool, uint32_t> visited(inner_vertices, false);
+    typename FRAG_T::template vertex_array_t<bool> visited(inner_vertices, false);
     std::vector<vertex_t> outers;
-    VertexArray<bool, uint32_t> outer_visited(outer_vertices, false);
+    typename FRAG_T::template vertex_array_t<bool> outer_visited(outer_vertices, false);
 
-    uint32_t comp_id = 0;
+    vid_t comp_id = 0;
 
     vertex_t u, v;
     for (const auto& x : inner_vertices) {
@@ -74,7 +76,7 @@ class WCCAuto : public AutoAppBase<FRAG_T, WCCAutoContext<FRAG_T>> {
         auto es = frag.GetOutgoingAdjList(u);
         auto e = es.begin();
         while (e != es.end()) {
-          v = e->neighbor;
+          v = e->get_neighbor();
           ++e;
           if (frag.IsInnerVertex(v)) {
             if (!visited[v]) {
@@ -101,7 +103,7 @@ class WCCAuto : public AutoAppBase<FRAG_T, WCCAutoContext<FRAG_T>> {
         auto es2 = frag.GetIncomingAdjList(u);
         e = es2.begin();
         while (e != es2.end()) {
-          v = e->neighbor;
+          v = e->get_neighbor();
           ++e;
           if (frag.IsInnerVertex(v)) {
             if (!visited[v]) {
@@ -152,8 +154,8 @@ class WCCAuto : public AutoAppBase<FRAG_T, WCCAutoContext<FRAG_T>> {
 
     for (auto& v : inner_vertices) {
       if (ctx.global_cluster_id.IsUpdated(v)) {
-        uint32_t tag = ctx.global_cluster_id.GetValue(v);
-        uint32_t comp_id = ctx.local_comp_id[v];
+        cid_t tag = ctx.global_cluster_id.GetValue(v);
+        vid_t comp_id = ctx.local_comp_id[v];
         if (ctx.global_comp_id[comp_id] > tag) {
           ctx.global_comp_id[comp_id] = tag;
           updated[comp_id] = true;
@@ -161,7 +163,7 @@ class WCCAuto : public AutoAppBase<FRAG_T, WCCAutoContext<FRAG_T>> {
       }
     }
 
-    for (uint32_t comp_id = 0; comp_id < ctx.outer_vertices.size(); comp_id++) {
+    for (vid_t comp_id = 0; comp_id < ctx.outer_vertices.size(); comp_id++) {
       if (updated[comp_id]) {
         auto tag = ctx.global_comp_id[comp_id];
 

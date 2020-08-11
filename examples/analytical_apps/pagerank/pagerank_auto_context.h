@@ -39,8 +39,8 @@ class PageRankAutoContext : public ContextBase<FRAG_T> {
     auto inner_vertices = frag.InnerVertices();
     auto vertices = frag.Vertices();
     degree.Init(inner_vertices, 0);
-    results.Init(vertices, 0.0, [](double& lhs, double rhs) {
-      lhs = rhs;
+    results.Init(vertices, 0.0, [](double* lhs, double rhs) {
+      *lhs = rhs;
       return true;
     });
 
@@ -62,7 +62,7 @@ class PageRankAutoContext : public ContextBase<FRAG_T> {
     }
   }
 
-  VertexArray<int, vid_t> degree;
+  typename FRAG_T::template vertex_array_t<int> degree;
   SyncBuffer<double, vid_t> results;
   int step = 0;
   int max_round = 0;

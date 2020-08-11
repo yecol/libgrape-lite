@@ -61,8 +61,8 @@ class CDLPContext : public ContextBase<FRAG_T> {
     }
   }
 
-  VertexArray<label_t, vid_t> labels;
-  VertexArray<bool, vid_t> changed;
+  typename FRAG_T::template vertex_array_t<label_t> labels;
+  typename FRAG_T::template vertex_array_t<bool> changed;
 
 #ifdef PROFILING
   double preprocess_time = 0;

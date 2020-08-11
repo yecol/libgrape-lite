@@ -41,8 +41,8 @@ class CDLPAutoContext : public ContextBase<FRAG_T> {
 
     auto vertices = frag.Vertices();
     auto inner_vertices = frag.InnerVertices();
-    labels.Init(vertices, 0, [](label_t& lhs, label_t rhs) {
-      lhs = rhs;
+    labels.Init(vertices, 0, [](label_t* lhs, label_t rhs) {
+      *lhs = rhs;
       return true;
     });
     changed.Init(inner_vertices);
@@ -80,7 +80,7 @@ class CDLPAutoContext : public ContextBase<FRAG_T> {
   }
 
   SyncBuffer<label_t, vid_t> labels;
-  VertexArray<bool, vid_t> changed;
+  typename FRAG_T::template vertex_array_t<bool> changed;
 
 #ifdef PROFILING
   double preprocess_time = 0;

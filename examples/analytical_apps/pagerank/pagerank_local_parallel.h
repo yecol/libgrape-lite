@@ -83,7 +83,7 @@ class PageRankLocalParallel
         double cur = 0;
         auto es = frag.GetIncomingInnerVertexAdjList(u);
         for (auto& e : es) {
-          cur += ctx.result[e.neighbor];
+          cur += ctx.result[e.get_neighbor()];
         }
         ctx.next_result[u] = cur;
       });
@@ -108,7 +108,7 @@ class PageRankLocalParallel
         double cur = ctx.next_result[u];
         auto es = frag.GetIncomingOuterVertexAdjList(u);
         for (auto& e : es) {
-          cur += ctx.result[e.neighbor];
+          cur += ctx.result[e.get_neighbor()];
         }
         ctx.next_result[u] = 1 - ctx.delta + ctx.delta * cur;
         messages.SendMsgThroughOEdges<fragment_t, double>(
@@ -120,7 +120,7 @@ class PageRankLocalParallel
         double cur = ctx.next_result[u];
         auto es = frag.GetIncomingOuterVertexAdjList(u);
         for (auto& e : es) {
-          cur += ctx.result[e.neighbor];
+          cur += ctx.result[e.get_neighbor()];
         }
         ctx.next_result[u] = 1 - ctx.delta + ctx.delta * cur;
       });

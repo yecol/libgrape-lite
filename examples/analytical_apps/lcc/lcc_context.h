@@ -64,9 +64,9 @@ class LCCContext : public ContextBase<FRAG_T> {
 #endif
   }
 
-  VertexArray<int, vid_t> global_degree;
-  VertexArray<std::vector<vertex_t>, vid_t> complete_neighbor;
-  VertexArray<int, vid_t> tricnt;
+  typename FRAG_T::template vertex_array_t<int> global_degree;
+  typename FRAG_T::template vertex_array_t<std::vector<vertex_t>> complete_neighbor;
+  typename FRAG_T::template vertex_array_t<int> tricnt;
 
   int stage = 0;
 

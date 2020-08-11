@@ -31,13 +31,12 @@ namespace grape {
  * @tparam FRAG_T
  */
 template <typename FRAG_T>
-class PageRank
-    : public BatchShuffleAppBase<FRAG_T, PageRankContext<FRAG_T>>,
-      public ParallelEngine,
-      public Communicator {
+class PageRank : public BatchShuffleAppBase<FRAG_T, PageRankContext<FRAG_T>>,
+                 public ParallelEngine,
+                 public Communicator {
  public:
-  INSTALL_BATCH_SHUFFLE_WORKER(PageRank<FRAG_T>,
-                               PageRankContext<FRAG_T>, FRAG_T)
+  INSTALL_BATCH_SHUFFLE_WORKER(PageRank<FRAG_T>, PageRankContext<FRAG_T>,
+                               FRAG_T)
 
   using vertex_t = typename FRAG_T::vertex_t;
   using vid_t = typename FRAG_T::vid_t;
@@ -117,7 +116,7 @@ class PageRank
         double cur = 0;
         auto es = frag.GetOutgoingInnerVertexAdjList(u);
         for (auto& e : es) {
-          cur += ctx.result[e.neighbor];
+          cur += ctx.result[e.get_neighbor()];
         }
         ctx.next_result[u] = cur;
       });
@@ -135,7 +134,7 @@ class PageRank
           double cur = ctx.next_result[u];
           auto es = frag.GetOutgoingAdjList(u, src_fid);
           for (auto& e : es) {
-            cur += ctx.result[e.neighbor];
+            cur += ctx.result[e.get_neighbor()];
           }
           ctx.next_result[u] = cur;
         });
@@ -157,7 +156,7 @@ class PageRank
             double cur = ctx.next_result[u];
             auto es = frag.GetOutgoingAdjList(u, src_fid);
             for (auto& e : es) {
-              cur += ctx.result[e.neighbor];
+              cur += ctx.result[e.get_neighbor()];
             }
             int en = frag.GetLocalOutDegree(u);
             ctx.next_result[u] = en > 0 ? (ctx.delta * cur + base) / en : base;
@@ -180,7 +179,7 @@ class PageRank
         double cur = 0;
         auto es = frag.GetOutgoingAdjList(u);
         for (auto& e : es) {
-          cur += ctx.result[e.neighbor];
+          cur += ctx.result[e.get_neighbor()];
         }
         int en = frag.GetLocalOutDegree(u);
         ctx.next_result[u] = en > 0 ? (ctx.delta * cur + base) / en : base;

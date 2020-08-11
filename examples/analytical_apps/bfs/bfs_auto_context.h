@@ -38,9 +38,9 @@ class BFSAutoContext : public ContextBase<FRAG_T> {
 
     auto vertices = frag.Vertices();
     partial_result.Init(vertices, std::numeric_limits<int64_t>::max(),
-                        [](int64_t& lhs, int64_t rhs) {
-                          if (lhs > rhs) {
-                            lhs = rhs;
+                        [](int64_t* lhs, int64_t rhs) {
+                          if (*lhs > rhs) {
+                            *lhs = rhs;
                             return true;
                           } else {
                             return false;

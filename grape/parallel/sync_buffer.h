@@ -74,7 +74,7 @@ class SyncBuffer : public ISyncBuffer {
   inline const std::type_info& GetTypeId() const override { return typeid(T); }
 
   void Init(VertexRange<VID_T> range, const T& value,
-            const std::function<bool(T&, T&&)>& aggregator) {
+            const std::function<bool(T*, T&&)>& aggregator) {
     range_ = range;
     data_.Init(range, value);
     updated_.Init(range, false);
@@ -113,7 +113,7 @@ class SyncBuffer : public ISyncBuffer {
   }
 
   void Aggregate(Vertex<VID_T> v, T&& rhs) {
-    bool updated = aggregator_(data_[v], std::move(rhs));
+    bool updated = aggregator_(&data_[v], std::move(rhs));
     updated_[v] = updated_[v] || updated;
   }
 
@@ -122,7 +122,7 @@ class SyncBuffer : public ISyncBuffer {
   VertexArray<bool, VID_T> updated_;
   VertexRange<VID_T> range_;
 
-  std::function<bool(T&, T&&)> aggregator_;
+  std::function<bool(T*, T&&)> aggregator_;
 };
 }  // namespace grape
 

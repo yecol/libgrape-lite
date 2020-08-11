@@ -64,7 +64,7 @@ class BFSContext : public ContextBase<FRAG_T> {
   }
 
   oid_t source_id;
-  VertexArray<depth_type, vid_t> partial_result;
+  typename FRAG_T::template vertex_array_t<depth_type> partial_result;
   DenseVertexSet<vid_t> curr_inner_updated, next_inner_updated;
 
   depth_type current_depth = 0;

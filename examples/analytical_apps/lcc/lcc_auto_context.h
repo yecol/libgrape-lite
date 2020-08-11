@@ -35,18 +35,18 @@ class LCCAutoContext : public ContextBase<FRAG_T> {
 
   void Init(const FRAG_T& frag, AutoParallelMessageManager<FRAG_T>& messages) {
     auto vertices = frag.Vertices();
-    global_degree.Init(vertices, 0, [](int& lhs, int rhs) {
-      lhs = rhs;
+    global_degree.Init(vertices, 0, [](int* lhs, int rhs) {
+      *lhs = rhs;
       return true;
     });
     complete_neighbor.Init(
         vertices, std::vector<vid_t>(),
-        [](std::vector<vid_t>& lhs, std::vector<vid_t>&& rhs) {
-          lhs = std::move(rhs);
+        [](std::vector<vid_t>* lhs, std::vector<vid_t>&& rhs) {
+          *lhs = std::move(rhs);
           return true;
         });
-    tricnt.Init(vertices, 0, [](int& lhs, int rhs) {
-      lhs = lhs + rhs;
+    tricnt.Init(vertices, 0, [](int* lhs, int rhs) {
+      *lhs = *lhs + rhs;
       return true;
     });
 

@@ -73,7 +73,7 @@ class SSSPContext : public ContextBase<FRAG_T> {
   }
 
   oid_t source_id;
-  VertexArray<double, vid_t> partial_result;
+  typename FRAG_T::template vertex_array_t<double> partial_result;
 
   Bitset curr_modified, next_modified;
 

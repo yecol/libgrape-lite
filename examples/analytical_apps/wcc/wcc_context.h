@@ -51,7 +51,7 @@ class WCCContext : public ContextBase<FRAG_T> {
 #endif
   }
 
-  VertexArray<vid_t, vid_t> comp_id;
+  typename FRAG_T::template vertex_array_t<vid_t> comp_id;
 
   Bitset curr_modified, next_modified;
 

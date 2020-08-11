@@ -39,9 +39,9 @@ class SSSPAutoContext : public ContextBase<FRAG_T> {
     this->source_id = source_id;
     auto vertices = frag.Vertices();
     partial_result.Init(vertices, std::numeric_limits<double>::max(),
-                        [](double& lhs, double rhs) {
-                          if (lhs > rhs) {
-                            lhs = rhs;
+                        [](double* lhs, double rhs) {
+                          if (*lhs > rhs) {
+                            *lhs = rhs;
                             return true;
                           } else {
                             return false;

@@ -35,32 +35,26 @@ class WCCAutoContext : public ContextBase<FRAG_T> {
   using vertex_t = typename FRAG_T::vertex_t;
 
  public:
+#ifdef WCC_USE_GID
+  using cid_t = vid_t;
+#else
+  using cid_t = oid_t;
+#endif
+
   void Init(const FRAG_T& frag, AutoParallelMessageManager<FRAG_T>& messages) {
     auto vertices = frag.Vertices();
     auto inner_vertices = frag.InnerVertices();
 
-    local_comp_id.Init(inner_vertices, std::numeric_limits<uint32_t>::max());
-#ifdef WCC_USE_GID
-    global_cluster_id.Init(vertices, std::numeric_limits<vid_t>::max(),
-                           [](vid_t& lhs, vid_t rhs) {
-                             if (lhs > rhs) {
-                               lhs = rhs;
+    local_comp_id.Init(inner_vertices, std::numeric_limits<vid_t>::max());
+    global_cluster_id.Init(vertices, std::numeric_limits<cid_t>::max(),
+                           [](cid_t* lhs, cid_t rhs) {
+                             if (*lhs > rhs) {
+                               *lhs = rhs;
                                return true;
                              } else {
                                return false;
                              }
                            });
-#else
-    global_cluster_id.Init(vertices, std::numeric_limits<oid_t>::max(),
-                           [](oid_t& lhs, oid_t rhs) {
-                             if (lhs > rhs) {
-                               lhs = rhs;
-                               return true;
-                             } else {
-                               return false;
-                             }
-                           });
-#endif
     messages.RegisterSyncBuffer(frag, &global_cluster_id,
                                 MessageStrategy::kSyncOnOuterVertex);
   }
@@ -73,14 +67,9 @@ class WCCAutoContext : public ContextBase<FRAG_T> {
   }
 
   std::vector<std::vector<vertex_t>> outer_vertices;
-  VertexArray<vid_t, vid_t> local_comp_id;
-#ifdef WCC_USE_GID
-  std::vector<vid_t> global_comp_id;
-  SyncBuffer<vid_t, vid_t> global_cluster_id;
-#else
-  std::vector<oid_t> global_comp_id;
-  SyncBuffer<oid_t, vid_t> global_cluster_id;
-#endif
+  typename FRAG_T::template vertex_array_t<vid_t> local_comp_id;
+  std::vector<cid_t> global_comp_id;
+  SyncBuffer<cid_t, vid_t> global_cluster_id;
 };
 }  // namespace grape
 

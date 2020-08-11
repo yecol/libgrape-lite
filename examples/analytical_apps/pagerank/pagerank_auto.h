@@ -71,13 +71,12 @@ class PageRankAuto : public AutoAppBase<FRAG_T, PageRankAutoContext<FRAG_T>>,
   }
 
   void IncEval(const fragment_t& frag, context_t& ctx) {
-    using vid_t = typename context_t::vid_t;
     auto vertices = frag.Vertices();
     auto inner_vertices = frag.InnerVertices();
 
     double dangling_sum = ctx.dangling_sum;
 
-    VertexArray<double, vid_t> next_results;
+    typename FRAG_T::template vertex_array_t<double> next_results;
     next_results.Init(inner_vertices);
 
     size_t graph_vnum = frag.GetTotalVerticesNum();
@@ -100,7 +99,7 @@ class PageRankAuto : public AutoAppBase<FRAG_T, PageRankAutoContext<FRAG_T>>,
         double cur = 0;
         auto es = frag.GetIncomingAdjList(u);
         for (auto& e : es) {
-          cur += ctx.results[e.neighbor];
+          cur += ctx.results[e.get_neighbor()];
         }
         cur = (ctx.delta * cur + base) / ctx.degree[u];
         next_results[u] = cur;

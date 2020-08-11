@@ -67,9 +67,9 @@ class PageRankLocalParallelContext : public ContextBase<FRAG_T> {
 #endif
   }
 
-  VertexArray<int, vid_t> degree;
-  VertexArray<double, vid_t> result;
-  VertexArray<double, vid_t> next_result;
+  typename FRAG_T::template vertex_array_t<int> degree;
+  typename FRAG_T::template vertex_array_t<double> result;
+  typename FRAG_T::template vertex_array_t<double> next_result;
 
 #ifdef PROFILING
   double preprocess_time = 0;
