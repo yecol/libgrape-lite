@@ -84,7 +84,8 @@ class LCCAuto : public AutoAppBase<FRAG_T, LCCAutoContext<FRAG_T>> {
     } else if (ctx.stage == 1) {
       ctx.stage = 2;
 
-      typename FRAG_T::template vertex_array_t<bool> v0_nbr_set(vertices, false);
+      typename FRAG_T::template vertex_array_t<bool> v0_nbr_set(vertices,
+                                                                false);
       for (auto v : inner_vertices) {
         auto& v0_nbr_vec = ctx.complete_neighbor[v];
         for (auto u_gid : v0_nbr_vec) {

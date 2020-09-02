@@ -16,11 +16,11 @@ limitations under the License.
 #ifndef EXAMPLES_ANALYTICAL_APPS_WCC_WCC_AUTO_H_
 #define EXAMPLES_ANALYTICAL_APPS_WCC_WCC_AUTO_H_
 
+#include <grape/grape.h>
+
 #include <queue>
 #include <utility>
 #include <vector>
-
-#include <grape/grape.h>
 
 #include "wcc/wcc_auto_context.h"
 
@@ -49,9 +49,11 @@ class WCCAuto : public AutoAppBase<FRAG_T, WCCAutoContext<FRAG_T>> {
     auto outer_vertices = frag.OuterVertices();
     auto vertices = frag.Vertices();
 
-    typename FRAG_T::template vertex_array_t<bool> visited(inner_vertices, false);
+    typename FRAG_T::template vertex_array_t<bool> visited(inner_vertices,
+                                                           false);
     std::vector<vertex_t> outers;
-    typename FRAG_T::template vertex_array_t<bool> outer_visited(outer_vertices, false);
+    typename FRAG_T::template vertex_array_t<bool> outer_visited(outer_vertices,
+                                                                 false);
 
     vid_t comp_id = 0;
 

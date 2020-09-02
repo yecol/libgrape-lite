@@ -16,11 +16,11 @@ limitations under the License.
 #ifndef EXAMPLES_ANALYTICAL_APPS_LCC_LCC_CONTEXT_H_
 #define EXAMPLES_ANALYTICAL_APPS_LCC_LCC_CONTEXT_H_
 
+#include <grape/grape.h>
+
 #include <iomanip>
 #include <limits>
 #include <vector>
-
-#include <grape/grape.h>
 
 namespace grape {
 /**
@@ -65,7 +65,8 @@ class LCCContext : public ContextBase<FRAG_T> {
   }
 
   typename FRAG_T::template vertex_array_t<int> global_degree;
-  typename FRAG_T::template vertex_array_t<std::vector<vertex_t>> complete_neighbor;
+  typename FRAG_T::template vertex_array_t<std::vector<vertex_t>>
+      complete_neighbor;
   typename FRAG_T::template vertex_array_t<int> tricnt;
 
   int stage = 0;
