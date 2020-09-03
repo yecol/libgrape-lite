@@ -1,6 +1,11 @@
 project(libgrape-lite C CXX)
 cmake_minimum_required(VERSION 2.8)
 
+set(LIBGRAPELITE_MAJOR_VERSION 0)
+set(LIBGRAPELITE_MINOR_VERSION 1)
+set(LIBGRAPELITE_PATCH_VERSION 0)
+set(LIBGRAPELITE_VERSION ${LIBGRAPELITE_MAJOR_VERSION}.${LIBGRAPELITE_MINOR_VERSION}.${LIBGRAPELITE_PATCH_VERSION})
+
 # ------------------------------------------------------------------------------
 # cmake options
 # ------------------------------------------------------------------------------
@@ -41,6 +46,7 @@ message("[libgrape-lite] will build in type: ${CMAKE_BUILD_TYPE}")
 # ------------------------------------------------------------------------------
 
 include(CheckLibraryExists)
+include(GNUInstallDirs)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -101,11 +107,22 @@ if (NOT RDKAFKA_FOUND)
     message(STATUS "rdkafka not found, build without rdkafka")
 endif ()
 
+macro(install_libgrapelite_target target)
+    # install
+    install(TARGETS ${target}
+        EXPORT libgrapelite-targets
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin
+    )
+endmacro()
+
 # ------------------------------------------------------------------------------
 # generate libgrape-lite
 # ------------------------------------------------------------------------------
 file(GLOB_RECURSE CORE_SRC_FILES "grape/*.cc")
 add_library(grape-lite ${CORE_SRC_FILES})
+install_libgrapelite_target(grape-lite)
 
 target_link_libraries(grape-lite ${MPI_CXX_LIBRARIES}
         ${CMAKE_THREAD_LIBS_INIT}
@@ -125,6 +142,7 @@ else ()
     set_target_properties(analytical_apps PROPERTIES OUTPUT_NAME run_app)
     target_link_libraries(analytical_apps grape-lite ${MPI_CXX_LIBRARIES}
             ${GLOG_LIBRARIES} ${GFLAGS_LIBRARIES} ${CMAKE_DL_LIBS})
+    install_libgrapelite_target(analytical_apps)
 endif ()
 
 if (NOT GFLAGS_FOUND)
@@ -140,7 +158,29 @@ else ()
             ${RDKAFKA_INCLUDE_DIR})
     target_link_libraries(gnn_sampler grape-lite  ${MPI_CXX_LIBRARIES}
             ${GLOG_LIBRARIES} ${GFLAGS_LIBRARIES} ${CMAKE_DL_LIBS} ${RDKAFKA_LIBRARIES})
+    install_libgrapelite_target(gnn_sampler)
 endif ()
+
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/grape
+        DESTINATION include                 # target directory
+        FILES_MATCHING                      # install only matched files
+        PATTERN "*.h"                       # select header files
+)
+
+configure_file(libgrapelite-config.in.cmake
+               "${PROJECT_BINARY_DIR}/libgrapelite-config.cmake" @ONLY
+)
+configure_file(libgrapelite-config-version.in.cmake
+               "${PROJECT_BINARY_DIR}/libgrapelite-config-version.cmake" @ONLY
+)
+install(FILES "${PROJECT_BINARY_DIR}/libgrapelite-config.cmake"
+              "${PROJECT_BINARY_DIR}/libgrapelite-config-version.cmake"
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/libgrapelite
+)
+install(EXPORT libgrapelite-targets
+        FILE libgrapelite-targets.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/libgrapelite
+)
 
 # ------------------------------------------------------------------------------
 # format code
