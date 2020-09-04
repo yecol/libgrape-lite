@@ -14,6 +14,7 @@ option(USE_HUGEPAGES "Whether to use hugepages." OFF)
 option(BUILD_SHARED_LIBS "Whether to build libgrape-lite as shared library" ON)
 option(PROFILING "Whether to enable profiling" OFF)
 option(WITH_ASAN "Build with Address Sanitizer" OFF)
+option(BUILD_LIBGRAPELITE_DOCS "Build libgrape-lite documentation" ON)
 
 if (USE_HUGEPAGES AND LINUX)
     add_definitions(-DUSE_HUGEPAGES)
@@ -211,7 +212,10 @@ add_custom_target(cpplint
 # ------------------------------------------------------------------------------
 # generate docs
 # ------------------------------------------------------------------------------
-add_custom_target(doc COMMAND doxygen "${CMAKE_CURRENT_SOURCE_DIR}/misc/doc-config"
-        COMMENT "Generating docs."
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-        VERBATIM)
+if(BUILD_LIBGRAPELITE_DOCS)
+    add_custom_target(doc COMMAND doxygen "${CMAKE_CURRENT_SOURCE_DIR}/misc/doc-config"
+            COMMENT "Generating docs."
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            VERBATIM)
+endif()
+
