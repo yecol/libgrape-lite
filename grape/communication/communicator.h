@@ -96,6 +96,44 @@ class Communicator {
     AllReduce<T>(msg_in, msg_out, [](T& lhs, const T& rhs) { lhs += rhs; });
   }
 
+  void ArchiveAllGather(const InArchive& in_archive, OutArchive& out_archive) {
+    int worker_id, worker_num;
+    MPI_Comm_rank(comm_, &worker_id);
+    MPI_Comm_size(comm_, &worker_num);
+
+    size_t send_byte_count = in_archive.GetSize();
+    size_t* total_byte_lens =
+        reinterpret_cast<size_t*>(malloc(sizeof(size_t) * worker_num));
+    MPI_Allgather(&send_byte_count, sizeof(size_t), MPI_CHAR, total_byte_lens,
+                  sizeof(size_t), MPI_CHAR, comm_);
+
+    size_t total_byte_count = 0;
+    for (int i = 0; i < worker_num; ++i) {
+      total_byte_count += total_byte_lens[i];
+    }
+
+    out_archive.Allocate(total_byte_count);
+    if (worker_id == 0) {
+      char* ptr = out_archive.GetBuffer();
+      for (int src_worker = 1; src_worker < worker_num; ++src_worker) {
+        recv_buffer<char>(ptr, total_byte_lens[src_worker], src_worker, comm_,
+                          src_worker);
+        ptr += total_byte_lens[src_worker];
+      }
+      memcpy(ptr, in_archive.GetBuffer(), send_byte_count);
+      for (int dst_worker = 1; dst_worker < worker_num; ++dst_worker) {
+        send_buffer<char>(out_archive.GetBuffer(), total_byte_count, dst_worker,
+                          comm_, 0);
+      }
+    } else {
+      send_buffer<char>(in_archive.GetBuffer(), send_byte_count, 0, comm_,
+                        worker_id);
+      recv_buffer<char>(out_archive.GetBuffer(), total_byte_count, 0, comm_, 0);
+    }
+
+    free(total_byte_lens);
+  }
+
  private:
   MPI_Comm comm_;
 };
