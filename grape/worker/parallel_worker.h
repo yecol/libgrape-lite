@@ -80,7 +80,8 @@ class ParallelWorker {
     MPI_Barrier(comm_spec_.comm());
 
     context_ = std::make_shared<context_t>();
-    context_->Init(*graph_, messages_, std::forward<Args>(args)...);
+    context_->set_fragment(graph_);
+    context_->Init(messages_, std::forward<Args>(args)...);
     if (comm_spec_.worker_id() == kCoordinatorRank) {
       VLOG(1) << "[Coordinator]: Finished Init";
     }
@@ -118,7 +119,7 @@ class ParallelWorker {
     messages_.Finalize();
   }
 
-  void Output(std::ostream& os) { context_->Output(*graph_, os); }
+  void Output(std::ostream& os) { context_->Output(os); }
 
  private:
   std::shared_ptr<APP_T> app_;

@@ -30,8 +30,8 @@ namespace grape {
 template <typename FRAG_T>
 class ContextBase {
  public:
-  ContextBase() {}
-  virtual ~ContextBase() {}
+  ContextBase() = default;
+  virtual ~ContextBase() = default;
 
   /**
    * @brief Output function to implement for result output.
@@ -42,7 +42,7 @@ class ContextBase {
    * @param frag
    * @param os
    */
-  virtual void Output(const FRAG_T& frag, std::ostream& os) {}
+  virtual void Output(std::ostream& os) {}
 };
 
 }  // namespace grape

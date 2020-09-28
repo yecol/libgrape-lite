@@ -27,16 +27,17 @@ namespace grape {
  * @tparam FRAG_T
  */
 template <typename FRAG_T>
-class BFSContext : public ContextBase<FRAG_T> {
+class BFSContext : public VertexDataContext<FRAG_T, int64_t> {
  public:
   using depth_type = int64_t;
   using oid_t = typename FRAG_T::oid_t;
   using vid_t = typename FRAG_T::vid_t;
 
-  void Init(const FRAG_T& frag, ParallelMessageManager& messages,
+  void Init(ParallelMessageManager& messages,
             oid_t src_id) {
     source_id = src_id;
 
+    auto &frag = this->fragment();
     auto vertices = frag.Vertices();
     partial_result.Init(vertices, std::numeric_limits<depth_type>::max());
 
@@ -50,9 +51,11 @@ class BFSContext : public ContextBase<FRAG_T> {
 #endif
   }
 
-  void Output(const FRAG_T& frag, std::ostream& os) {
+  void Output(std::ostream& os) {
+    auto &frag = this->fragment();
     auto inner_vertices = frag.InnerVertices();
     for (auto v : inner_vertices) {
+      this->SetValue(v, partial_result[v]);
       os << frag.GetId(v) << " " << partial_result[v] << std::endl;
     }
 
