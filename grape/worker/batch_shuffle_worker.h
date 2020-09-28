@@ -83,6 +83,7 @@ class BatchShuffleWorker {
     MPI_Barrier(comm_spec_.comm());
 
     context_ = std::make_shared<context_t>();
+    context_->set_fragment(graph_);
     context_->Init(messages_, std::forward<Args>(args)...);
 
     int round = 0;
