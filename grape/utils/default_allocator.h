@@ -43,11 +43,11 @@ class DefaultAllocator {
   DefaultAllocator& operator=(DefaultAllocator&&) noexcept { return *this; }
 
   pointer allocate(size_type __n) {
-#ifdef __APPLE__
+// #ifdef __APPLE__
     return static_cast<pointer>(malloc(__n * sizeof(_Tp)));
-#else
-    return static_cast<pointer>(aligned_alloc(64, __n * sizeof(_Tp)));
-#endif
+// #else
+//    return static_cast<pointer>(aligned_alloc(64, __n * sizeof(_Tp)));
+// #endif
   }
 
   void deallocate(pointer __p, size_type) { free(__p); }
