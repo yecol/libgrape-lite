@@ -58,7 +58,7 @@ class ParallelWorker {
   ParallelWorker(std::shared_ptr<APP_T> app, std::shared_ptr<fragment_t> graph)
       : app_(app), graph_(graph) {}
 
-  virtual ~ParallelWorker() {}
+  ~ParallelWorker() = default;
 
   void Init(const CommSpec& comm_spec,
             const ParallelEngineSpec& pe_spec = DefaultParallelEngineSpec()) {

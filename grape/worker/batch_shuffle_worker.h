@@ -60,7 +60,7 @@ class BatchShuffleWorker {
                      std::shared_ptr<fragment_t> graph)
       : app_(app), graph_(graph) {}
 
-  virtual ~BatchShuffleWorker() {}
+  ~BatchShuffleWorker() = default;
 
   void Init(const CommSpec& comm_spec,
             const ParallelEngineSpec& pe_spec = DefaultParallelEngineSpec()) {
@@ -83,7 +83,7 @@ class BatchShuffleWorker {
     MPI_Barrier(comm_spec_.comm());
 
     context_ = std::make_shared<context_t>();
-    context_->Init(*graph_, messages_, std::forward<Args>(args)...);
+    context_->Init(messages_, std::forward<Args>(args)...);
 
     int round = 0;
 
@@ -120,7 +120,9 @@ class BatchShuffleWorker {
     messages_.Finalize();
   }
 
-  void Output(std::ostream& os) { context_->Output(*graph_, os); }
+  std::shared_ptr<context_t> GetContext() { return context_; }
+
+  void Output(std::ostream& os) { context_->Output(os); }
 
  private:
   std::shared_ptr<APP_T> app_;

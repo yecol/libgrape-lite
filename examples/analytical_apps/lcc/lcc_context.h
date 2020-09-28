@@ -29,29 +29,36 @@ namespace grape {
  * @tparam FRAG_T
  */
 template <typename FRAG_T>
-class LCCContext : public ContextBase<FRAG_T> {
+class LCCContext : public VertexDataContext<FRAG_T, double> {
  public:
   using oid_t = typename FRAG_T::oid_t;
   using vid_t = typename FRAG_T::vid_t;
   using vertex_t = typename FRAG_T::vertex_t;
 
-  void Init(const FRAG_T& frag, ParallelMessageManager& messages) {
+  void Init(ParallelMessageManager& messages) {
+    auto &frag = this->fragment();
     auto vertices = frag.Vertices();
+
     global_degree.Init(vertices);
     complete_neighbor.Init(vertices);
     tricnt.Init(vertices, 0);
   }
 
-  void Output(const FRAG_T& frag, std::ostream& os) {
+  void Output(std::ostream& os) {
+    auto &frag = this->fragment();
     auto inner_vertices = frag.InnerVertices();
+
     for (auto v : inner_vertices) {
       if (global_degree[v] == 0 || global_degree[v] == 1) {
+        this->SetValue(v, 0);
         os << frag.GetId(v) << " " << std::scientific << std::setprecision(15)
            << 0.0 << std::endl;
       } else {
         double re = 2.0 * (tricnt[v]) /
                     (static_cast<int64_t>(global_degree[v]) *
                      (static_cast<int64_t>(global_degree[v]) - 1));
+
+        this->SetValue(v, re);
         os << frag.GetId(v) << " " << std::scientific << std::setprecision(15)
            << re << std::endl;
       }

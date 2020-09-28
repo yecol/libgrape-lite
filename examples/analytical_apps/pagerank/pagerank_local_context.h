@@ -27,15 +27,16 @@ namespace grape {
  * @tparam FRAG_T
  */
 template <typename FRAG_T>
-class PageRankLocalContext : public ContextBase<FRAG_T> {
+class PageRankLocalContext : public VertexDataContext<FRAG_T, double> {
   using oid_t = typename FRAG_T::oid_t;
   using vid_t = typename FRAG_T::vid_t;
 
  public:
-  void Init(const FRAG_T& frag, BatchShuffleMessageManager& messages,
+  void Init(BatchShuffleMessageManager& messages,
             double delta, int max_round) {
-    auto inner_vertices = frag.InnerVertices();
+    auto &frag = this->fragment();
     auto vertices = frag.Vertices();
+
     this->delta = delta;
     this->max_round = max_round;
     result.Init(vertices);
@@ -46,9 +47,12 @@ class PageRankLocalContext : public ContextBase<FRAG_T> {
     step = 0;
   }
 
-  void Output(const FRAG_T& frag, std::ostream& os) {
+  void Output(std::ostream& os) {
+    auto &frag = this->fragment();
     auto inner_vertices = frag.InnerVertices();
+
     for (auto v : inner_vertices) {
+      this->SetValue(v, result[v]);
       os << frag.GetId(v) << " " << std::scientific << std::setprecision(15)
          << result[v] << std::endl;
     }

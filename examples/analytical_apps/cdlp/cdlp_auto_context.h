@@ -25,7 +25,8 @@ namespace grape {
  * @tparam FRAG_T
  */
 template <typename FRAG_T>
-class CDLPAutoContext : public ContextBase<FRAG_T> {
+class CDLPAutoContext
+    : public VertexDataContext<FRAG_T, typename FRAG_T::oid_t> {
  public:
   using oid_t = typename FRAG_T::oid_t;
   using vid_t = typename FRAG_T::vid_t;
@@ -35,12 +36,12 @@ class CDLPAutoContext : public ContextBase<FRAG_T> {
   using label_t = oid_t;
 #endif
 
-  void Init(const FRAG_T& frag, AutoParallelMessageManager<FRAG_T>& messages,
-            int max_round) {
-    this->max_round = max_round;
-
+  void Init(AutoParallelMessageManager<FRAG_T>& messages, int max_round) {
+    auto& frag = this->fragment();
     auto vertices = frag.Vertices();
     auto inner_vertices = frag.InnerVertices();
+
+    this->max_round = max_round;
     labels.Init(vertices, 0, [](label_t* lhs, label_t rhs) {
       *lhs = rhs;
       return true;
@@ -72,9 +73,12 @@ class CDLPAutoContext : public ContextBase<FRAG_T> {
     step = 0;
   }
 
-  void Output(const FRAG_T& frag, std::ostream& os) {
+  void Output(std::ostream& os) {
+    auto& frag = this->fragment();
     auto inner_vertices = frag.InnerVertices();
+
     for (auto v : inner_vertices) {
+      this->SetValue(v, labels[v]);
       os << frag.GetId(v) << " " << labels[v] << std::endl;
     }
   }

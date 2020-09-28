@@ -30,17 +30,18 @@ namespace grape {
  * @tparam FRAG_T
  */
 template <typename FRAG_T>
-class SSSPContext : public ContextBase<FRAG_T> {
+class SSSPContext : public VertexDataContext<FRAG_T, double> {
  public:
   using oid_t = typename FRAG_T::oid_t;
   using vid_t = typename FRAG_T::vid_t;
 
-  void Init(const FRAG_T& frag, ParallelMessageManager& messages,
+  void Init(ParallelMessageManager& messages,
             oid_t source_id) {
-    this->source_id = source_id;
+    auto &frag = this->fragment();
     auto vertices = frag.Vertices();
-    partial_result.Init(vertices, std::numeric_limits<double>::max());
 
+    this->source_id = source_id;
+    partial_result.Init(vertices, std::numeric_limits<double>::max());
     curr_modified.init(frag.GetVerticesNum());
     next_modified.init(frag.GetVerticesNum());
 
@@ -51,13 +52,17 @@ class SSSPContext : public ContextBase<FRAG_T> {
 #endif
   }
 
-  void Output(const FRAG_T& frag, std::ostream& os) {
+  void Output(std::ostream& os) {
     // If the distance is the max value for vertex_data_type
     // then the vertex is not connected to the source vertex.
     // According to specs, the output should be +inf
+    auto &frag = this->fragment();
     auto inner_vertices = frag.InnerVertices();
+
     for (auto v : inner_vertices) {
       double d = partial_result[v];
+
+      this->SetValue(v, d);
       if (d == std::numeric_limits<double>::max()) {
         os << frag.GetId(v) << " infinity" << std::endl;
       } else {

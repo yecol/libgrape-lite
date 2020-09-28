@@ -27,17 +27,19 @@ namespace grape {
  * @tparam FRAG_T
  */
 template <typename FRAG_T>
-class PageRankAutoContext : public ContextBase<FRAG_T> {
+class PageRankAutoContext : public VertexDataContext<FRAG_T, double> {
  public:
   using oid_t = typename FRAG_T::oid_t;
   using vid_t = typename FRAG_T::vid_t;
 
-  void Init(const FRAG_T& frag, AutoParallelMessageManager<FRAG_T>& messages,
+  void Init(AutoParallelMessageManager<FRAG_T>& messages,
             double delta, int max_round) {
-    this->delta = delta;
-    this->max_round = max_round;
+    auto &frag = this->fragment();
     auto inner_vertices = frag.InnerVertices();
     auto vertices = frag.Vertices();
+
+    this->delta = delta;
+    this->max_round = max_round;
     degree.Init(inner_vertices, 0);
     results.Init(vertices, 0.0, [](double* lhs, double rhs) {
       *lhs = rhs;
@@ -49,13 +51,17 @@ class PageRankAutoContext : public ContextBase<FRAG_T> {
     step = 0;
   }
 
-  void Output(const FRAG_T& frag, std::ostream& os) {
+  void Output(std::ostream& os) {
+    auto &frag = this->fragment();
     auto inner_vertices = frag.InnerVertices();
+
     for (auto v : inner_vertices) {
       if (degree[v] == 0) {
+        this->SetValue(v, results[v]);
         os << frag.GetId(v) << " " << std::scientific << std::setprecision(15)
            << results[v] << std::endl;
       } else {
+        this->SetValue(v, results[v] * degree[v]);
         os << frag.GetId(v) << " " << std::scientific << std::setprecision(15)
            << results[v] * degree[v] << std::endl;
       }

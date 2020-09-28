@@ -35,12 +35,11 @@ class BFSContext : public VertexDataContext<FRAG_T, int64_t> {
 
   void Init(ParallelMessageManager& messages,
             oid_t src_id) {
-    source_id = src_id;
-
     auto &frag = this->fragment();
     auto vertices = frag.Vertices();
-    partial_result.Init(vertices, std::numeric_limits<depth_type>::max());
 
+    source_id = src_id;
+    partial_result.Init(vertices, std::numeric_limits<depth_type>::max());
     avg_degree = static_cast<double>(frag.GetEdgeNum()) /
                  static_cast<double>(frag.GetInnerVerticesNum());
 
@@ -54,6 +53,7 @@ class BFSContext : public VertexDataContext<FRAG_T, int64_t> {
   void Output(std::ostream& os) {
     auto &frag = this->fragment();
     auto inner_vertices = frag.InnerVertices();
+
     for (auto v : inner_vertices) {
       this->SetValue(v, partial_result[v]);
       os << frag.GetId(v) << " " << partial_result[v] << std::endl;

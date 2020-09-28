@@ -16,10 +16,10 @@ limitations under the License.
 #ifndef EXAMPLES_ANALYTICAL_APPS_WCC_WCC_AUTO_CONTEXT_H_
 #define EXAMPLES_ANALYTICAL_APPS_WCC_WCC_AUTO_CONTEXT_H_
 
+#include <grape/grape.h>
+
 #include <limits>
 #include <vector>
-
-#include <grape/grape.h>
 
 namespace grape {
 
@@ -29,7 +29,8 @@ namespace grape {
  * @tparam FRAG_T
  */
 template <typename FRAG_T>
-class WCCAutoContext : public ContextBase<FRAG_T> {
+class WCCAutoContext
+    : public VertexDataContext<FRAG_T, typename FRAG_T::oid_t> {
   using oid_t = typename FRAG_T::oid_t;
   using vid_t = typename FRAG_T::vid_t;
   using vertex_t = typename FRAG_T::vertex_t;
@@ -41,7 +42,8 @@ class WCCAutoContext : public ContextBase<FRAG_T> {
   using cid_t = oid_t;
 #endif
 
-  void Init(const FRAG_T& frag, AutoParallelMessageManager<FRAG_T>& messages) {
+  void Init(AutoParallelMessageManager<FRAG_T>& messages) {
+    auto& frag = this->fragment();
     auto vertices = frag.Vertices();
     auto inner_vertices = frag.InnerVertices();
 
@@ -59,9 +61,12 @@ class WCCAutoContext : public ContextBase<FRAG_T> {
                                 MessageStrategy::kSyncOnOuterVertex);
   }
 
-  void Output(const FRAG_T& frag, std::ostream& os) {
+  void Output(std::ostream& os) {
+    auto& frag = this->fragment();
     auto inner_vertices = frag.InnerVertices();
+
     for (auto v : inner_vertices) {
+      this->SetValue(v, global_cluster_id.GetValue(v));
       os << frag.GetId(v) << " " << global_cluster_id.GetValue(v) << std::endl;
     }
   }

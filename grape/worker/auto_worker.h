@@ -59,7 +59,8 @@ class AutoWorker {
 
   AutoWorker(std::shared_ptr<APP_T> app, std::shared_ptr<fragment_t> graph)
       : app_(app), graph_(graph) {}
-  ~AutoWorker() {}
+
+  ~AutoWorker() = default;
 
   void Init(const CommSpec& comm_spec,
             const ParallelEngineSpec& pe_spec = DefaultParallelEngineSpec()) {
@@ -82,7 +83,8 @@ class AutoWorker {
     MPI_Barrier(comm_spec_.comm());
 
     context_ = std::make_shared<context_t>();
-    context_->Init(*graph_, messages_, std::forward<Args>(args)...);
+    context_->set_fragment(graph_);
+    context_->Init(messages_, std::forward<Args>(args)...);
 
     int round = 0;
 
@@ -119,7 +121,9 @@ class AutoWorker {
     messages_.Finalize();
   }
 
-  void Output(std::ostream& os) { context_->Output(*graph_, os); }
+  std::shared_ptr<context_t> GetContext() { return context_; }
+
+  void Output(std::ostream& os) { context_->Output(os); }
 
  private:
   std::shared_ptr<APP_T> app_;

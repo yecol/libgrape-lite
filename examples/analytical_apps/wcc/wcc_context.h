@@ -25,12 +25,13 @@ namespace grape {
  * @tparam FRAG_T
  */
 template <typename FRAG_T>
-class WCCContext : public ContextBase<FRAG_T> {
+class WCCContext : public VertexDataContext<FRAG_T, typename FRAG_T::oid_t> {
  public:
   using oid_t = typename FRAG_T::oid_t;
   using vid_t = typename FRAG_T::vid_t;
 
-  void Init(const FRAG_T& frag, ParallelMessageManager& messages) {
+  void Init(ParallelMessageManager& messages) {
+    auto &frag = this->fragment();
     auto vertices = frag.Vertices();
 
     comp_id.Init(vertices);
@@ -39,9 +40,12 @@ class WCCContext : public ContextBase<FRAG_T> {
     next_modified.init(frag.GetVerticesNum());
   }
 
-  void Output(const FRAG_T& frag, std::ostream& os) {
+  void Output(std::ostream& os) {
+    auto &frag = this->fragment();
     auto inner_vertices = frag.InnerVertices();
+
     for (auto v : inner_vertices) {
+      this->SetValue(v, comp_id[v]);
       os << frag.GetId(v) << " " << comp_id[v] << std::endl;
     }
 #ifdef PROFILING
