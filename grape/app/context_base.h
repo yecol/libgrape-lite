@@ -27,7 +27,6 @@ namespace grape {
  * during supersteps.
  *
  */
-template <typename FRAG_T>
 class ContextBase {
  public:
   ContextBase() = default;

@@ -5,7 +5,7 @@
 namespace grape {
 
 template <typename FRAG_T, typename DATA_T>
-class VertexDataContext : public ContextBase<FRAG_T> {
+class VertexDataContext : public ContextBase {
   using fragment_t = FRAG_T;
   using vertex_t = typename fragment_t::vertex_t;
   using vid_t = typename fragment_t::vid_t;
