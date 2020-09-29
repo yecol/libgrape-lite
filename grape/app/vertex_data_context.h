@@ -46,6 +46,8 @@ class VertexDataContext : public ContextBase {
 
   const DATA_T& GetValue(vertex_t v) const { return data_[v]; }
 
+  grape::VertexArray<DATA_T, vid_t>& data() { return data; }
+
  protected:
   std::shared_ptr<FRAG_T> fragment_;
 
