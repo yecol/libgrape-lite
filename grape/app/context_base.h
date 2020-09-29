@@ -32,6 +32,8 @@ class ContextBase {
   ContextBase() = default;
   virtual ~ContextBase() = default;
 
+  virtual const char* context_type() const = 0;
+
   /**
    * @brief This method will be invoked when app has been finished.
    * User may override this method to cleanup or save result.

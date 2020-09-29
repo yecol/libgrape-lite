@@ -38,7 +38,7 @@ class VertexDataContext : public ContextBase {
     return *fragment_;
   }
 
-  const char* context_type() const { return CONTEXT_TYPE_VERTEX_DATA; }
+  const char* context_type() const override { return CONTEXT_TYPE_VERTEX_DATA; }
 
   void SetValue(const DATA_T& data) { data_.SetValue(data); }
 
