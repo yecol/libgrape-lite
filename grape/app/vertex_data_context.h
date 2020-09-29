@@ -27,30 +27,31 @@ class VertexDataContext : public ContextBase {
   using vertex_t = typename fragment_t::vertex_t;
   using vid_t = typename fragment_t::vid_t;
   using oid_t = typename fragment_t::oid_t;
+  using data_t = DATA_T;
 
  public:
-  void set_fragment(std::shared_ptr<FRAG_T> &fragment) {
+  void set_fragment(std::shared_ptr<fragment_t> &fragment) {
     fragment_ = fragment;
     data_.Init(fragment->InnerVertices());
   }
 
-  const FRAG_T& fragment() {
+  const fragment_t& fragment() {
     return *fragment_;
   }
 
   std::string context_type() const override { return CONTEXT_TYPE_VERTEX_DATA; }
 
-  void SetValue(const DATA_T& data) { data_.SetValue(data); }
+  void SetValue(const data_t& data) { data_.SetValue(data); }
 
-  void SetValue(vertex_t v, const DATA_T& data) { data_[v] = data; }
+  void SetValue(vertex_t v, const data_t& data) { data_[v] = data; }
 
-  const DATA_T& GetValue(vertex_t v) const { return data_[v]; }
+  const data_t& GetValue(vertex_t v) const { return data_[v]; }
 
-  grape::VertexArray<DATA_T, vid_t>& data() { return data; }
+  grape::VertexArray<data_t, vid_t>& data() { return data; }
 
  private:
-  std::shared_ptr<FRAG_T> fragment_;
-  grape::VertexArray<DATA_T, vid_t> data_;
+  std::shared_ptr<fragment_t> fragment_;
+  grape::VertexArray<data_t, vid_t> data_;
 };
 
 }  // namespace grape
