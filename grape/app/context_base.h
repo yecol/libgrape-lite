@@ -33,6 +33,12 @@ class ContextBase {
   virtual ~ContextBase() = default;
 
   /**
+   * @brief This method will be invoked when app has been finished.
+   * User may override this method to cleanup or save result.
+   */
+  virtual void Finalize() {}
+
+  /**
    * @brief Output function to implement for result output.
    * @note: This pure virtual function works as an interface, instructing users
    * to implement in their defined context. The Output in the inherited apps

@@ -52,10 +52,7 @@ class SSSPContext : public VertexDataContext<FRAG_T, double> {
 #endif
   }
 
-  void Output(std::ostream& os) {
-    // If the distance is the max value for vertex_data_type
-    // then the vertex is not connected to the source vertex.
-    // According to specs, the output should be +inf
+  void Finalize() override {
     auto &frag = this->fragment();
     auto inner_vertices = frag.InnerVertices();
 
@@ -63,6 +60,24 @@ class SSSPContext : public VertexDataContext<FRAG_T, double> {
       double d = partial_result[v];
 
       this->SetValue(v, d);
+    }
+#ifdef PROFILING
+    VLOG(2) << "preprocess_time: " << preprocess_time << "s.";
+    VLOG(2) << "exec_time: " << exec_time << "s.";
+    VLOG(2) << "postprocess_time: " << postprocess_time << "s.";
+#endif
+  }
+
+  void Output(std::ostream& os) override {
+    // If the distance is the max value for vertex_data_type
+    // then the vertex is not connected to the source vertex.
+    // According to specs, the output should be +inf
+    auto &frag = this->fragment();
+    auto inner_vertices = frag.InnerVertices();
+
+    for (auto v : inner_vertices) {
+      double d = this->GetValue(v);
+
       if (d == std::numeric_limits<double>::max()) {
         os << frag.GetId(v) << " infinity" << std::endl;
       } else {
@@ -70,11 +85,6 @@ class SSSPContext : public VertexDataContext<FRAG_T, double> {
            << d << std::endl;
       }
     }
-#ifdef PROFILING
-    VLOG(2) << "preprocess_time: " << preprocess_time << "s.";
-    VLOG(2) << "exec_time: " << exec_time << "s.";
-    VLOG(2) << "postprocess_time: " << postprocess_time << "s.";
-#endif
   }
 
   oid_t source_id;

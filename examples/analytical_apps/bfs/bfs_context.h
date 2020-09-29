@@ -50,20 +50,27 @@ class BFSContext : public VertexDataContext<FRAG_T, int64_t> {
 #endif
   }
 
-  void Output(std::ostream& os) {
+  void Finalize() override {
     auto &frag = this->fragment();
     auto inner_vertices = frag.InnerVertices();
 
     for (auto v : inner_vertices) {
       this->SetValue(v, partial_result[v]);
-      os << frag.GetId(v) << " " << partial_result[v] << std::endl;
     }
-
 #ifdef PROFILING
     VLOG(2) << "preprocess_time: " << preprocess_time << "s.";
     VLOG(2) << "exec_time: " << exec_time << "s.";
     VLOG(2) << "postprocess_time: " << postprocess_time << "s.";
 #endif
+  }
+
+  void Output(std::ostream& os) override {
+    auto &frag = this->fragment();
+    auto inner_vertices = frag.InnerVertices();
+
+    for (auto v : inner_vertices) {
+      os << frag.GetId(v) << " " << this->GetValue(v) << std::endl;
+    }
   }
 
   oid_t source_id;

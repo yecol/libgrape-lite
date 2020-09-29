@@ -76,7 +76,7 @@ class SamplerContext : public VertexDataContext<FRAG_T, std::string> {
 #endif
   }
 
-  void Output(std::ostream& os) {
+  void Output(std::ostream& os) override {
     auto& frag = this->fragment();
     auto t_begin = grape::GetCurrentTime();
     vertex_t v;
@@ -87,8 +87,6 @@ class SamplerContext : public VertexDataContext<FRAG_T, std::string> {
       for (auto gid : it.second) {
         ss << " " << frag.Gid2Oid(gid);
       }
-      CHECK(frag.GetVertex(it.first, v));
-      this->SetValue(v, ss.str());
       os << ss.str() << std::flush;
     }
 

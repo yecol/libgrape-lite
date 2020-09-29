@@ -115,7 +115,7 @@ class AutoWorker {
       }
       ++step;
     }
-
+    context_->Finalize();
     MPI_Barrier(comm_spec_.comm());
 
     messages_.Finalize();

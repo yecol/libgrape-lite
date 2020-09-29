@@ -47,20 +47,28 @@ class PageRankLocalContext : public VertexDataContext<FRAG_T, double> {
     step = 0;
   }
 
-  void Output(std::ostream& os) {
-    auto &frag = this->fragment();
+  void Finalize() override {
+    auto& frag = this->fragment();
     auto inner_vertices = frag.InnerVertices();
 
     for (auto v : inner_vertices) {
       this->SetValue(v, result[v]);
-      os << frag.GetId(v) << " " << std::scientific << std::setprecision(15)
-         << result[v] << std::endl;
     }
 #ifdef PROFILING
     VLOG(2) << "preprocess_time: " << preprocess_time << "s.";
     VLOG(2) << "exec_time: " << exec_time << "s.";
     VLOG(2) << "postprocess_time: " << postprocess_time << "s.";
 #endif
+  }
+
+  void Output(std::ostream& os) override {
+    auto& frag = this->fragment();
+    auto inner_vertices = frag.InnerVertices();
+
+    for (auto v : inner_vertices) {
+      os << frag.GetId(v) << " " << std::scientific << std::setprecision(15)
+         << this->GetValue(v) << std::endl;
+    }
   }
 
   typename FRAG_T::template vertex_array_t<double> result;
