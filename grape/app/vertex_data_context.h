@@ -48,10 +48,8 @@ class VertexDataContext : public ContextBase {
 
   grape::VertexArray<DATA_T, vid_t>& data() { return data; }
 
- protected:
-  std::shared_ptr<FRAG_T> fragment_;
-
  private:
+  std::shared_ptr<FRAG_T> fragment_;
   grape::VertexArray<DATA_T, vid_t> data_;
 };
 
