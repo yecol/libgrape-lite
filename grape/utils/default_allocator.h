@@ -46,6 +46,8 @@ class DefaultAllocator {
 // #ifdef __APPLE__
     return static_cast<pointer>(malloc(__n * sizeof(_Tp)));
 // #else
+// FIXME(lxj): aligned_alloc requires "size is integral multiple of
+// alignment". We can not use aligned_alloc without check.
 //    return static_cast<pointer>(aligned_alloc(64, __n * sizeof(_Tp)));
 // #endif
   }
