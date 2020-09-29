@@ -32,7 +32,7 @@ class ContextBase {
   ContextBase() = default;
   virtual ~ContextBase() = default;
 
-  virtual const char* context_type() const = 0;
+  virtual std::string context_type() const = 0;
 
   /**
    * @brief This method will be invoked when app has been finished.
