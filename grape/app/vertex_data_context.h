@@ -28,6 +28,7 @@ class VertexDataContext : public ContextBase {
   using vid_t = typename fragment_t::vid_t;
   using oid_t = typename fragment_t::oid_t;
   using data_t = DATA_T;
+  using vertex_array_t = typename fragment_t::template vertex_array_t<data_t>;
 
  public:
   void set_fragment(std::shared_ptr<fragment_t> &fragment) {
@@ -47,11 +48,11 @@ class VertexDataContext : public ContextBase {
 
   const data_t& GetValue(vertex_t v) const { return data_[v]; }
 
-  grape::VertexArray<data_t, vid_t>& data() { return data_; }
+  vertex_array_t& data() { return data_; }
 
  private:
   std::shared_ptr<fragment_t> fragment_;
-  typename fragment_t::template vertex_array_t<data_t> data_;
+  vertex_array_t data_;
 };
 
 }  // namespace grape
