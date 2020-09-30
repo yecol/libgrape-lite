@@ -36,7 +36,7 @@ class VertexDataContext : public ContextBase {
     data_.Init(fragment->InnerVertices());
   }
 
-  fragment_t& fragment() {
+  const fragment_t& fragment() {
     return *fragment_;
   }
 
