@@ -67,10 +67,14 @@ class PageRankAutoContext : public VertexDataContext<FRAG_T, double> {
   void Output(std::ostream& os) override {
     auto& frag = this->fragment();
     auto inner_vertices = frag.InnerVertices();
-
     for (auto v : inner_vertices) {
-      os << frag.GetId(v) << " " << std::scientific << std::setprecision(15)
-         << this->GetValue(v) << std::endl;
+      if (degree[v] == 0) {
+        os << frag.GetId(v) << " " << std::scientific << std::setprecision(15)
+           << results[v] << std::endl;
+      } else {
+        os << frag.GetId(v) << " " << std::scientific << std::setprecision(15)
+           << results[v] * degree[v] << std::endl;
+      }
     }
   }
 

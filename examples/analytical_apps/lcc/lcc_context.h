@@ -44,6 +44,30 @@ class LCCContext : public VertexDataContext<FRAG_T, double> {
     tricnt.Init(vertices, 0);
   }
 
+
+  void Output(std::ostream& os) override {
+    auto& frag = this->fragment();
+    auto inner_vertices = frag.InnerVertices();
+    for (auto v : inner_vertices) {
+      if (global_degree[v] == 0 || global_degree[v] == 1) {
+        os << frag.GetId(v) << " " << std::scientific << std::setprecision(15)
+           << 0.0 << std::endl;
+      } else {
+        double re = 2.0 * (tricnt[v]) /
+            (static_cast<int64_t>(global_degree[v]) *
+                (static_cast<int64_t>(global_degree[v]) - 1));
+        os << frag.GetId(v) << " " << std::scientific << std::setprecision(15)
+           << re << std::endl;
+      }
+    }
+
+#ifdef PROFILING
+    VLOG(2) << "preprocess_time: " << preprocess_time << "s.";
+    VLOG(2) << "exec_time: " << exec_time << "s.";
+    VLOG(2) << "postprocess_time: " << postprocess_time << "s.";
+#endif
+  }
+
   void Finalize() override {
     auto& frag = this->fragment();
     auto inner_vertices = frag.InnerVertices();
@@ -53,26 +77,11 @@ class LCCContext : public VertexDataContext<FRAG_T, double> {
         this->SetValue(v, 0.0);
       } else {
         double re = 2.0 * (tricnt[v]) /
-                    (static_cast<int64_t>(global_degree[v]) *
-                     (static_cast<int64_t>(global_degree[v]) - 1));
+            (static_cast<int64_t>(global_degree[v]) *
+                (static_cast<int64_t>(global_degree[v]) - 1));
 
         this->SetValue(v, re);
       }
-    }
-#ifdef PROFILING
-    VLOG(2) << "preprocess_time: " << preprocess_time << "s.";
-    VLOG(2) << "exec_time: " << exec_time << "s.";
-    VLOG(2) << "postprocess_time: " << postprocess_time << "s.";
-#endif
-  }
-
-  void Output(std::ostream& os) override {
-    auto& frag = this->fragment();
-    auto inner_vertices = frag.InnerVertices();
-
-    for (auto v : inner_vertices) {
-      os << frag.GetId(v) << " " << std::scientific << std::setprecision(15)
-         << this->GetValue(v) << std::endl;
     }
   }
 

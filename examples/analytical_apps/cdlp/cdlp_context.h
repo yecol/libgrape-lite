@@ -55,21 +55,22 @@ class CDLPContext : public VertexDataContext<FRAG_T, typename FRAG_T::oid_t> {
     step = 0;
   }
 
+  void Output(std::ostream& os) override {
+    auto &frag = this->fragment();
+    auto inner_vertices = frag.InnerVertices();
+
+    for (auto v : inner_vertices) {
+      os << frag.GetId(v) << " " << labels[v] << std::endl;
+    }
+  }
+
+
   void Finalize() override {
     auto &frag = this->fragment();
     auto inner_vertices = frag.InnerVertices();
 
     for (auto v : inner_vertices) {
       this->SetValue(v, labels[v]);
-    }
-  }
-
-  void Output(std::ostream& os) override {
-    auto &frag = this->fragment();
-    auto inner_vertices = frag.InnerVertices();
-
-    for (auto v : inner_vertices) {
-      os << frag.GetId(v) << " " << this->GetValue(v) << std::endl;
     }
   }
 

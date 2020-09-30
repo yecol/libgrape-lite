@@ -58,7 +58,7 @@ class AutoWorker {
                 "The loaded graph is not valid for application");
 
   AutoWorker(std::shared_ptr<APP_T> app, std::shared_ptr<fragment_t> graph)
-      : app_(app), graph_(graph), ctx_finalized_(false) {}
+      : app_(app), graph_(graph) {}
 
   ~AutoWorker() = default;
 
@@ -76,11 +76,10 @@ class AutoWorker {
     InitCommunicator(app_, comm_spec_.comm());
   }
 
-  void Finalize() {}
+  void Finalize() { context_->Finalize(); }
 
   template <class... Args>
   void Query(Args&&... args) {
-    ctx_finalized_ = false;
     MPI_Barrier(comm_spec_.comm());
 
     context_ = std::make_shared<context_t>();
@@ -122,19 +121,16 @@ class AutoWorker {
   }
 
   std::shared_ptr<context_t> GetContext() {
-    if (!ctx_finalized_) {
-      context_->Finalize();
-      ctx_finalized_ = true;
-    }
     return context_;
   }
 
-  void Output(std::ostream& os) { context_->Output(os); }
+  void Output(std::ostream& os) {
+    context_->Output(os);
+  }
 
  private:
   std::shared_ptr<APP_T> app_;
   std::shared_ptr<fragment_t> graph_;
-  bool ctx_finalized_;
   std::shared_ptr<context_t> context_;
   message_manager_t messages_;
 

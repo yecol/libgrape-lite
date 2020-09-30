@@ -52,6 +52,28 @@ class SSSPContext : public VertexDataContext<FRAG_T, double> {
 #endif
   }
 
+  void Output(std::ostream& os) override {
+    // If the distance is the max value for vertex_data_type
+    // then the vertex is not connected to the source vertex.
+    // According to specs, the output should be +inf
+    auto &frag = this->fragment();
+    auto inner_vertices = frag.InnerVertices();
+    for (auto v : inner_vertices) {
+      double d = partial_result[v];
+      if (d == std::numeric_limits<double>::max()) {
+        os << frag.GetId(v) << " infinity" << std::endl;
+      } else {
+        os << frag.GetId(v) << " " << std::scientific << std::setprecision(15)
+           << d << std::endl;
+      }
+    }
+#ifdef PROFILING
+    VLOG(2) << "preprocess_time: " << preprocess_time << "s.";
+    VLOG(2) << "exec_time: " << exec_time << "s.";
+    VLOG(2) << "postprocess_time: " << postprocess_time << "s.";
+#endif
+  }
+
   void Finalize() override {
     auto &frag = this->fragment();
     auto inner_vertices = frag.InnerVertices();
@@ -66,25 +88,6 @@ class SSSPContext : public VertexDataContext<FRAG_T, double> {
     VLOG(2) << "exec_time: " << exec_time << "s.";
     VLOG(2) << "postprocess_time: " << postprocess_time << "s.";
 #endif
-  }
-
-  void Output(std::ostream& os) override {
-    // If the distance is the max value for vertex_data_type
-    // then the vertex is not connected to the source vertex.
-    // According to specs, the output should be +inf
-    auto &frag = this->fragment();
-    auto inner_vertices = frag.InnerVertices();
-
-    for (auto v : inner_vertices) {
-      double d = this->GetValue(v);
-
-      if (d == std::numeric_limits<double>::max()) {
-        os << frag.GetId(v) << " infinity" << std::endl;
-      } else {
-        os << frag.GetId(v) << " " << std::scientific << std::setprecision(15)
-           << d << std::endl;
-      }
-    }
   }
 
   oid_t source_id;

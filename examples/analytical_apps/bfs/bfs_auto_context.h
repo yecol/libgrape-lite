@@ -52,21 +52,21 @@ class BFSAutoContext : public VertexDataContext<FRAG_T, int64_t> {
                                 MessageStrategy::kSyncOnOuterVertex);
   }
 
+  void Output(std::ostream& os) override {
+    auto &frag = this->fragment();
+    auto inner_vertices = frag.InnerVertices();
+
+    for (auto v : inner_vertices) {
+      os << frag.GetId(v) << " " << partial_result[v] << std::endl;
+    }
+  }
+
   void Finalize() override {
     auto &frag = this->fragment();
     auto inner_vertices = frag.InnerVertices();
 
     for (auto v : inner_vertices) {
       this->SetValue(v, partial_result[v]);
-    }
-  }
-
-  void Output(std::ostream& os) override {
-    auto &frag = this->fragment();
-    auto inner_vertices = frag.InnerVertices();
-
-    for (auto v : inner_vertices) {
-      os << frag.GetId(v) << " " << this->GetValue(v) << std::endl;
     }
   }
 
