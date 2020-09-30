@@ -35,7 +35,7 @@ class VertexDataContext : public ContextBase {
     data_.Init(fragment->InnerVertices());
   }
 
-  const fragment_t& fragment() {
+  fragment_t& fragment() {
     return *fragment_;
   }
 
@@ -47,7 +47,7 @@ class VertexDataContext : public ContextBase {
 
   const data_t& GetValue(vertex_t v) const { return data_[v]; }
 
-  grape::VertexArray<data_t, vid_t>& data() { return data; }
+  grape::VertexArray<data_t, vid_t>& data() { return data_; }
 
  private:
   std::shared_ptr<fragment_t> fragment_;
