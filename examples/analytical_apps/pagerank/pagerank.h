@@ -50,6 +50,8 @@ class PageRank : public BatchShuffleAppBase<FRAG_T, PageRankContext<FRAG_T>>,
 
   void PEval(const fragment_t& frag, context_t& ctx,
              message_manager_t& messages) {
+    if (ctx.max_round == 0) { return; }
+
     auto inner_vertices = frag.InnerVertices();
 
 #ifdef PROFILING
@@ -192,7 +194,7 @@ class PageRank : public BatchShuffleAppBase<FRAG_T, PageRankContext<FRAG_T>>,
 #ifdef PROFILING
     ctx.postprocess_time -= GetCurrentTime();
 #endif
-    if (ctx.step != ctx.max_round) {
+    if (ctx.step < ctx.max_round) {
       messages.SyncInnerVertices<fragment_t, double>(frag, ctx.next_result,
                                                      thread_num());
     }
