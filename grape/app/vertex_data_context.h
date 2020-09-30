@@ -51,7 +51,7 @@ class VertexDataContext : public ContextBase {
 
  private:
   std::shared_ptr<fragment_t> fragment_;
-  grape::VertexArray<data_t, vid_t> data_;
+  typename fragment_t::template vertex_array_t<data_t> data_;
 };
 
 }  // namespace grape
