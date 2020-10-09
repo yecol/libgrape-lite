@@ -27,10 +27,11 @@ class VertexDataContext : public ContextBase {
   using vertex_t = typename fragment_t::vertex_t;
   using vid_t = typename fragment_t::vid_t;
   using oid_t = typename fragment_t::oid_t;
-  using data_t = DATA_T;
-  using vertex_array_t = typename fragment_t::template vertex_array_t<data_t>;
+  using vertex_array_t = typename fragment_t::template vertex_array_t<DATA_T>;
 
  public:
+  using data_t = DATA_T;
+
   void set_fragment(std::shared_ptr<fragment_t> &fragment) {
     fragment_ = fragment;
     data_.Init(fragment->InnerVertices());

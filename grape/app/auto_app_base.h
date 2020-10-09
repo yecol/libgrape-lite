@@ -77,6 +77,7 @@ class AutoAppBase {
  public:                                                               \
   using fragment_t = FRAG_T;                                           \
   using context_t = CONTEXT_T;                                         \
+  using ctx_data_t = typename context_t::data_t;                       \
   using message_manager_t = grape::AutoParallelMessageManager<FRAG_T>; \
   using worker_t = grape::AutoWorker<APP_T>;                           \
   static std::shared_ptr<worker_t> CreateWorker(                       \
