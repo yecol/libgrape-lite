@@ -82,7 +82,6 @@ class ParallelAppBase {
  public:                                                          \
   using fragment_t = FRAG_T;                                      \
   using context_t = CONTEXT_T;                                    \
-  using ctx_data_t = typename context_t::data_t;                  \
   using message_manager_t = grape::ParallelMessageManager;        \
   using worker_t = grape::ParallelWorker<APP_T>;                  \
   virtual ~APP_T() {}                                             \
