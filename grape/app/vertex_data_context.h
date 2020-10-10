@@ -25,8 +25,6 @@ template <typename FRAG_T, typename DATA_T>
 class VertexDataContext : public ContextBase {
   using fragment_t = FRAG_T;
   using vertex_t = typename fragment_t::vertex_t;
-  using vid_t = typename fragment_t::vid_t;
-  using oid_t = typename fragment_t::oid_t;
   using vertex_array_t = typename fragment_t::template vertex_array_t<DATA_T>;
 
  public:
