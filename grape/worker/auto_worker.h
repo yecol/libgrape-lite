@@ -58,7 +58,7 @@ class AutoWorker {
                 "The loaded graph is not valid for application");
 
   AutoWorker(std::shared_ptr<APP_T> app, std::shared_ptr<fragment_t> graph)
-      : app_(app), graph_(graph) {}
+      : app_(app), graph_(graph), context_(std::make_shared<context_t>()) {}
 
   ~AutoWorker() = default;
 
@@ -72,6 +72,8 @@ class AutoWorker {
 
     messages_.Init(comm_spec_.comm());
 
+    context_->set_fragment(graph_);
+
     InitParallelEngine(app_, pe_spec);
     InitCommunicator(app_, comm_spec_.comm());
   }
@@ -82,8 +84,6 @@ class AutoWorker {
   void Query(Args&&... args) {
     MPI_Barrier(comm_spec_.comm());
 
-    context_ = std::make_shared<context_t>();
-    context_->set_fragment(graph_);
     context_->Init(messages_, std::forward<Args>(args)...);
 
     int round = 0;
