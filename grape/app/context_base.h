@@ -19,6 +19,8 @@ limitations under the License.
 #include <ostream>
 #include <memory>
 
+#include "grape/types.h"
+
 namespace grape {
 
 /**
@@ -29,7 +31,7 @@ namespace grape {
  */
 class ContextBase {
  public:
-  using data_t = void;
+  using data_t = EmptyType;
 
   ContextBase() = default;
   virtual ~ContextBase() = default;
