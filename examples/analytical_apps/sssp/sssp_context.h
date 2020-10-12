@@ -42,10 +42,9 @@ class SSSPContext : public VertexDataContext<FRAG_T, double> {
   void Init(ParallelMessageManager& messages,
             oid_t source_id) {
     auto &frag = this->fragment();
-    auto vertices = frag.Vertices();
 
     this->source_id = source_id;
-    partial_result.Init(vertices, std::numeric_limits<double>::max());
+    partial_result.SetValue(std::numeric_limits<double>::max());
     curr_modified.init(frag.GetVerticesNum());
     next_modified.init(frag.GetVerticesNum());
 
