@@ -34,7 +34,9 @@ class SSSPAutoContext : public VertexDataContext<FRAG_T, double> {
   using oid_t = typename FRAG_T::oid_t;
   using vid_t = typename FRAG_T::vid_t;
 
-  SSSPAutoContext() : partial_result(this->data()) {}
+  explicit SSSPAutoContext(FRAG_T& fragment)
+      : VertexDataContext<FRAG_T, double>(fragment),
+        partial_result(this->data()) {}
 
   void Init(AutoParallelMessageManager<FRAG_T>& messages, oid_t source_id) {
     auto &frag = this->fragment();

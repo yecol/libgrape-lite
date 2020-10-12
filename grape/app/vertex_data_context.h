@@ -30,20 +30,24 @@ class VertexDataContext : public ContextBase {
  public:
   using data_t = DATA_T;
 
-  void set_fragment(std::shared_ptr<fragment_t> &fragment) {
-    fragment_ = fragment;
+  explicit VertexDataContext(const fragment_t& fragment,
+                             bool including_outer = false)
+      : fragment_(fragment) {
+    if (including_outer) {
+      data_.Init(fragment.Vertices());
+    } else {
+      data_.Init(fragment.InnerVertices());
+    }
   }
 
-  const fragment_t& fragment() {
-    return *fragment_;
-  }
+  const fragment_t& fragment() { return fragment_; }
 
   std::string context_type() const override { return CONTEXT_TYPE_VERTEX_DATA; }
 
   vertex_array_t& data() { return data_; }
 
  private:
-  std::shared_ptr<fragment_t> fragment_;
+  const fragment_t& fragment_;
   vertex_array_t data_;
 };
 

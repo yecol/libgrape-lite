@@ -56,20 +56,19 @@ class ParallelWorker {
                 "The loaded graph is not valid for application");
 
   ParallelWorker(std::shared_ptr<APP_T> app, std::shared_ptr<fragment_t> graph)
-      : app_(app), graph_(graph), context_(std::make_shared<context_t>()) {}
+      : app_(app), context_(std::make_shared<context_t>(*graph)) {}
 
   ~ParallelWorker() = default;
 
   void Init(const CommSpec& comm_spec,
             const ParallelEngineSpec& pe_spec = DefaultParallelEngineSpec()) {
+    auto& graph = const_cast<fragment_t&>(context_->fragment());
     // prepare for the query
-    graph_->PrepareToRunApp(APP_T::message_strategy, APP_T::need_split_edges);
+    graph.PrepareToRunApp(APP_T::message_strategy, APP_T::need_split_edges);
 
     comm_spec_ = comm_spec;
 
     messages_.Init(comm_spec_.comm());
-
-    context_->set_fragment(graph_);
 
     InitParallelEngine(app_, pe_spec);
     InitCommunicator(app_, comm_spec_.comm());
@@ -79,6 +78,8 @@ class ParallelWorker {
 
   template <class... Args>
   void Query(Args&&... args) {
+    auto& graph = context_->fragment();
+
     MPI_Barrier(comm_spec_.comm());
 
     context_->Init(messages_, std::forward<Args>(args)...);
@@ -92,7 +93,7 @@ class ParallelWorker {
 
     messages_.StartARound();
 
-    app_->PEval(*graph_, *context_, messages_);
+    app_->PEval(graph, *context_, messages_);
 
     messages_.FinishARound();
 
@@ -106,7 +107,7 @@ class ParallelWorker {
       round++;
       messages_.StartARound();
 
-      app_->IncEval(*graph_, *context_, messages_);
+      app_->IncEval(graph, *context_, messages_);
 
       messages_.FinishARound();
 
@@ -130,7 +131,6 @@ class ParallelWorker {
 
  private:
   std::shared_ptr<APP_T> app_;
-  std::shared_ptr<fragment_t> graph_;
   std::shared_ptr<context_t> context_;
   message_manager_t messages_;
 
