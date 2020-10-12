@@ -34,7 +34,7 @@ class SSSPAutoContext : public VertexDataContext<FRAG_T, double> {
   using oid_t = typename FRAG_T::oid_t;
   using vid_t = typename FRAG_T::vid_t;
 
-  explicit SSSPAutoContext(FRAG_T& fragment)
+  explicit SSSPAutoContext(const FRAG_T& fragment)
       : VertexDataContext<FRAG_T, double>(fragment),
         partial_result(this->data()) {}
 
