@@ -32,7 +32,6 @@ class VertexDataContext : public ContextBase {
 
   void set_fragment(std::shared_ptr<fragment_t> &fragment) {
     fragment_ = fragment;
-    data_.Init(fragment->InnerVertices());
   }
 
   const fragment_t& fragment() {
