@@ -29,14 +29,16 @@ limitations under the License.
 
 namespace grape {
 template <typename FRAG_T>
-class SamplerContext : public VertexDataContext<FRAG_T, std::string> {
+class SamplerContext
+    : public VertexDataContext<FRAG_T, std::vector<typename FRAG_T::oid_t>> {
   using oid_t = typename FRAG_T::oid_t;
   using vid_t = typename FRAG_T::vid_t;
   using vertex_t = typename FRAG_T::vertex_t;
 
  public:
   explicit SamplerContext(const FRAG_T& fragment)
-      : VertexDataContext<FRAG_T, std::string>(fragment) {}
+      : VertexDataContext<FRAG_T, std::vector<typename FRAG_T::oid_t>>(
+            fragment) {}
 
   void Init(ParallelMessageManager& messages, const std::string& strategy,
             const std::string& sampler_hop_and_num,

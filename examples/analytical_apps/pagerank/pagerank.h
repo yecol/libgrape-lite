@@ -192,8 +192,10 @@ class PageRank : public BatchShuffleAppBase<FRAG_T, PageRankContext<FRAG_T>>,
 #ifdef PROFILING
     ctx.postprocess_time -= GetCurrentTime();
 #endif
+    ctx.result.Swap(ctx.next_result);
+
     if (ctx.step != ctx.max_round) {
-      messages.SyncInnerVertices<fragment_t, double>(frag, ctx.next_result,
+      messages.SyncInnerVertices<fragment_t, double>(frag, ctx.result,
                                                      thread_num());
     } else {
       auto& degree = ctx.degree;
@@ -204,9 +206,8 @@ class PageRank : public BatchShuffleAppBase<FRAG_T, PageRankContext<FRAG_T>>,
           result[v] *= degree[v];
         }
       }
+      return;
     }
-
-    ctx.result.Swap(ctx.next_result);
 #ifdef PROFILING
     ctx.postprocess_time += GetCurrentTime();
 #endif
