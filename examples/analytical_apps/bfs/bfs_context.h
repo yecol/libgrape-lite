@@ -34,7 +34,7 @@ class BFSContext : public VertexDataContext<FRAG_T, int64_t> {
   using vid_t = typename FRAG_T::vid_t;
 
   explicit BFSContext(const FRAG_T& fragment)
-      : VertexDataContext<FRAG_T, int64_t>(fragment),
+      : VertexDataContext<FRAG_T, int64_t>(fragment, true),
         partial_result(this->data()) {}
 
   void Init(ParallelMessageManager& messages,
