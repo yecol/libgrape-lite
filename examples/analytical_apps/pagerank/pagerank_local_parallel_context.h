@@ -32,6 +32,10 @@ class PageRankLocalParallelContext : public VertexDataContext<FRAG_T, double> {
   using vid_t = typename FRAG_T::vid_t;
 
  public:
+  explicit PageRankLocalParallelContext(const FRAG_T& fragment)
+      : VertexDataContext<FRAG_T, double>(fragment, true),
+        result(this->data()) {}
+
   void Init(ParallelMessageManager& messages, double delta,
             int max_round) {
     auto &frag = this->fragment();
@@ -41,7 +45,7 @@ class PageRankLocalParallelContext : public VertexDataContext<FRAG_T, double> {
     this->delta = delta;
     this->max_round = max_round;
     degree.Init(inner_vertices, 0);
-    result.Init(vertices, 0.0);
+    result.SetValue(0.0);
     next_result.Init(vertices);
     step = 0;
 #ifdef PROFILING
@@ -55,31 +59,8 @@ class PageRankLocalParallelContext : public VertexDataContext<FRAG_T, double> {
     auto& frag = this->fragment();
     auto inner_vertices = frag.InnerVertices();
     for (auto v : inner_vertices) {
-      if (degree[v] == 0) {
         os << frag.GetId(v) << " " << std::scientific << std::setprecision(15)
            << result[v] << std::endl;
-      } else {
-        os << frag.GetId(v) << " " << std::scientific << std::setprecision(15)
-           << result[v] * degree[v] << std::endl;
-      }
-    }
-#ifdef PROFILING
-    VLOG(2) << "preprocess_time: " << preprocess_time << "s.";
-    VLOG(2) << "exec_time: " << exec_time << "s.";
-    VLOG(2) << "postprocess_time: " << postprocess_time << "s.";
-#endif
-  }
-
-  void Finalize() override {
-    auto& frag = this->fragment();
-    auto inner_vertices = frag.InnerVertices();
-
-    for (auto v : inner_vertices) {
-      if (degree[v] == 0) {
-        this->SetValue(v, result[v]);
-      } else {
-        this->SetValue(v, result[v] * degree[v]);
-      }
     }
 #ifdef PROFILING
     VLOG(2) << "preprocess_time: " << preprocess_time << "s.";
@@ -89,7 +70,7 @@ class PageRankLocalParallelContext : public VertexDataContext<FRAG_T, double> {
   }
 
   typename FRAG_T::template vertex_array_t<int> degree;
-  typename FRAG_T::template vertex_array_t<double> result;
+  typename FRAG_T::template vertex_array_t<double>& result;
   typename FRAG_T::template vertex_array_t<double> next_result;
 
 #ifdef PROFILING

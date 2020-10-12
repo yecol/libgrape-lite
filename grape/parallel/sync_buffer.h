@@ -53,7 +53,7 @@ class ISyncBuffer {
 template <typename T, typename VID_T>
 class SyncBuffer : public ISyncBuffer {
  public:
-  SyncBuffer() = default;
+  SyncBuffer() : data_(internal_data_) {}
 
   explicit SyncBuffer(VertexArray<T, VID_T>& data)
       : data_(data) {}
@@ -120,6 +120,7 @@ class SyncBuffer : public ISyncBuffer {
   }
 
  private:
+  VertexArray<T, VID_T> internal_data_;
   VertexArray<T, VID_T>& data_;
   VertexArray<bool, VID_T> updated_;
   VertexRange<VID_T> range_;

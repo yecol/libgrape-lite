@@ -35,6 +35,9 @@ class LCCContext : public VertexDataContext<FRAG_T, double> {
   using vid_t = typename FRAG_T::vid_t;
   using vertex_t = typename FRAG_T::vertex_t;
 
+  explicit LCCContext(const FRAG_T& fragment)
+      : VertexDataContext<FRAG_T, double>(fragment) {}
+
   void Init(ParallelMessageManager& messages) {
     auto &frag = this->fragment();
     auto vertices = frag.Vertices();
@@ -43,7 +46,6 @@ class LCCContext : public VertexDataContext<FRAG_T, double> {
     complete_neighbor.Init(vertices);
     tricnt.Init(vertices, 0);
   }
-
 
   void Output(std::ostream& os) override {
     auto& frag = this->fragment();
@@ -66,23 +68,6 @@ class LCCContext : public VertexDataContext<FRAG_T, double> {
     VLOG(2) << "exec_time: " << exec_time << "s.";
     VLOG(2) << "postprocess_time: " << postprocess_time << "s.";
 #endif
-  }
-
-  void Finalize() override {
-    auto& frag = this->fragment();
-    auto inner_vertices = frag.InnerVertices();
-
-    for (auto v : inner_vertices) {
-      if (global_degree[v] == 0 || global_degree[v] == 1) {
-        this->SetValue(v, 0.0);
-      } else {
-        double re = 2.0 * (tricnt[v]) /
-            (static_cast<int64_t>(global_degree[v]) *
-                (static_cast<int64_t>(global_degree[v]) - 1));
-
-        this->SetValue(v, re);
-      }
-    }
   }
 
   typename FRAG_T::template vertex_array_t<int> global_degree;

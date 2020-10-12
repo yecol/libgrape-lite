@@ -32,6 +32,10 @@ class PageRankLocalContext : public VertexDataContext<FRAG_T, double> {
   using vid_t = typename FRAG_T::vid_t;
 
  public:
+  explicit PageRankLocalContext(const FRAG_T& fragment)
+      : VertexDataContext<FRAG_T, double>(fragment, true),
+        result(this->data()) {}
+
   void Init(BatchShuffleMessageManager& messages,
             double delta, int max_round) {
     auto &frag = this->fragment();
@@ -39,7 +43,7 @@ class PageRankLocalContext : public VertexDataContext<FRAG_T, double> {
 
     this->delta = delta;
     this->max_round = max_round;
-    result.Init(vertices);
+    result.SetValue(0.0);
     next_result.Init(vertices);
 
     avg_degree = static_cast<double>(frag.GetEdgeNum()) /
@@ -61,21 +65,7 @@ class PageRankLocalContext : public VertexDataContext<FRAG_T, double> {
 #endif
   }
 
-  void Finalize() override {
-    auto& frag = this->fragment();
-    auto inner_vertices = frag.InnerVertices();
-
-    for (auto v : inner_vertices) {
-      this->SetValue(v, result[v]);
-    }
-#ifdef PROFILING
-    VLOG(2) << "preprocess_time: " << preprocess_time << "s.";
-    VLOG(2) << "exec_time: " << exec_time << "s.";
-    VLOG(2) << "postprocess_time: " << postprocess_time << "s.";
-#endif
-  }
-
-  typename FRAG_T::template vertex_array_t<double> result;
+  typename FRAG_T::template vertex_array_t<double>& result;
   typename FRAG_T::template vertex_array_t<double> next_result;
 
 #ifdef PROFILING

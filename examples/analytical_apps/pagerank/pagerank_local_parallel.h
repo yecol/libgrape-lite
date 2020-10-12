@@ -125,6 +125,14 @@ class PageRankLocalParallel
         ctx.next_result[u] = 1 - ctx.delta + ctx.delta * cur;
       });
     } else {
+      auto& degree = ctx.degree;
+      auto& result = ctx.result;
+
+      for (auto v : inner_vertices) {
+        if (degree[v] != 0) {
+          result[v] *= degree[v];
+        }
+      }
       return;
     }
 

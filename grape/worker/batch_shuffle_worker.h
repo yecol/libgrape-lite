@@ -58,7 +58,7 @@ class BatchShuffleWorker {
 
   BatchShuffleWorker(std::shared_ptr<APP_T> app,
                      std::shared_ptr<fragment_t> graph)
-      : app_(app), context_(std::make_shared<context_t>(graph)) {}
+      : app_(app), context_(std::make_shared<context_t>(*graph)) {}
 
   ~BatchShuffleWorker() = default;
 

@@ -37,14 +37,16 @@ class CDLPContext : public VertexDataContext<FRAG_T, typename FRAG_T::oid_t> {
 #else
   using label_t = oid_t;
 #endif
+  explicit CDLPContext(const FRAG_T& fragment)
+      : VertexDataContext<FRAG_T, typename FRAG_T::oid_t>(fragment, true),
+        labels(this->data()) {}
+
   void Init(ParallelMessageManager& messages,
             int max_round) {
     auto &frag = this->fragment();
     auto inner_vertices = frag.InnerVertices();
-    auto vertices = frag.Vertices();
 
     this->max_round = max_round;
-    labels.Init(vertices);
     changed.Init(inner_vertices);
 
 #ifdef PROFILING
@@ -64,17 +66,7 @@ class CDLPContext : public VertexDataContext<FRAG_T, typename FRAG_T::oid_t> {
     }
   }
 
-
-  void Finalize() override {
-    auto &frag = this->fragment();
-    auto inner_vertices = frag.InnerVertices();
-
-    for (auto v : inner_vertices) {
-      this->SetValue(v, labels[v]);
-    }
-  }
-
-  typename FRAG_T::template vertex_array_t<label_t> labels;
+  typename FRAG_T::template vertex_array_t<label_t>& labels;
   typename FRAG_T::template vertex_array_t<bool> changed;
 
 #ifdef PROFILING

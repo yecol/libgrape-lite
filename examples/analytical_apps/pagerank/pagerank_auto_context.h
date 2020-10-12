@@ -32,6 +32,10 @@ class PageRankAutoContext : public VertexDataContext<FRAG_T, double> {
   using oid_t = typename FRAG_T::oid_t;
   using vid_t = typename FRAG_T::vid_t;
 
+  explicit PageRankAutoContext(const FRAG_T& fragment)
+      : VertexDataContext<FRAG_T, double>(fragment, true),
+        results(this->data()) {}
+
   void Init(AutoParallelMessageManager<FRAG_T>& messages,
             double delta, int max_round) {
     auto &frag = this->fragment();
@@ -51,30 +55,12 @@ class PageRankAutoContext : public VertexDataContext<FRAG_T, double> {
     step = 0;
   }
 
-  void Finalize() override {
-    auto& frag = this->fragment();
-    auto inner_vertices = frag.InnerVertices();
-
-    for (auto v : inner_vertices) {
-      if (degree[v] == 0) {
-        this->SetValue(v, results[v]);
-      } else {
-        this->SetValue(v, results[v] * degree[v]);
-      }
-    }
-  }
-
   void Output(std::ostream& os) override {
     auto& frag = this->fragment();
     auto inner_vertices = frag.InnerVertices();
     for (auto v : inner_vertices) {
-      if (degree[v] == 0) {
-        os << frag.GetId(v) << " " << std::scientific << std::setprecision(15)
-           << results[v] << std::endl;
-      } else {
-        os << frag.GetId(v) << " " << std::scientific << std::setprecision(15)
-           << results[v] * degree[v] << std::endl;
-      }
+      os << frag.GetId(v) << " " << std::scientific << std::setprecision(15)
+         << results[v] << std::endl;
     }
   }
 

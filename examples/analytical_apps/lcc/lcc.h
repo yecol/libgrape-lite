@@ -206,8 +206,20 @@ class LCC : public ParallelAppBase<FRAG_T, LCCContext<FRAG_T>>,
       ctx.preprocess_time += GetCurrentTime();
 #endif
     } else {
-      messages.ParallelProcess<fragment_t, int>(
-          thread_num(), frag, [](int tid, vertex_t u, int) {});
+      auto& global_degree = ctx.global_degree;
+      auto& tricnt = ctx.tricnt;
+      auto& ctx_data = ctx.data();
+
+      for (auto v : inner_vertices) {
+        if (global_degree[v] == 0 || global_degree[v] == 1) {
+          ctx_data[v] = 0;
+        } else {
+          double re = 2.0 * (tricnt[v]) /
+              (static_cast<int64_t>(global_degree[v]) *
+                  (static_cast<int64_t>(global_degree[v]) - 1));
+          ctx_data[v] = re;
+        }
+      }
     }
   }
 };

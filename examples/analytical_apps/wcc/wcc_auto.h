@@ -42,7 +42,6 @@ class WCCAuto : public AutoAppBase<FRAG_T, WCCAutoContext<FRAG_T>> {
   INSTALL_AUTO_WORKER(WCCAuto<FRAG_T>, WCCAutoContext<FRAG_T>, FRAG_T)
   using vertex_t = typename fragment_t::vertex_t;
   using vid_t = typename fragment_t::vid_t;
-  using cid_t = typename WCCAutoContext<FRAG_T>::cid_t;
 
   void PEval(const fragment_t& frag, context_t& ctx) {
     auto inner_vertices = frag.InnerVertices();
@@ -156,7 +155,7 @@ class WCCAuto : public AutoAppBase<FRAG_T, WCCAutoContext<FRAG_T>> {
 
     for (auto& v : inner_vertices) {
       if (ctx.global_cluster_id.IsUpdated(v)) {
-        cid_t tag = ctx.global_cluster_id.GetValue(v);
+        auto tag = ctx.global_cluster_id.GetValue(v);
         vid_t comp_id = ctx.local_comp_id[v];
         if (ctx.global_comp_id[comp_id] > tag) {
           ctx.global_comp_id[comp_id] = tag;

@@ -32,6 +32,10 @@ class PageRankContext : public VertexDataContext<FRAG_T, double> {
   using vid_t = typename FRAG_T::vid_t;
 
  public:
+  explicit PageRankContext(const FRAG_T& fragment)
+      : VertexDataContext<FRAG_T, double>(fragment, true),
+        result(this->data()) {}
+
   void Init(BatchShuffleMessageManager& messages,
             double delta, int max_round) {
     auto &frag = this->fragment();
@@ -41,7 +45,7 @@ class PageRankContext : public VertexDataContext<FRAG_T, double> {
     this->delta = delta;
     this->max_round = max_round;
     degree.Init(inner_vertices, 0);
-    result.Init(vertices, 0.0);
+    result.SetValue(0.0);
     next_result.Init(vertices);
     step = 0;
 
@@ -58,13 +62,8 @@ class PageRankContext : public VertexDataContext<FRAG_T, double> {
     auto& frag = this->fragment();
     auto inner_vertices = frag.InnerVertices();
     for (auto v : inner_vertices) {
-      if (degree[v] == 0) {
-        os << frag.GetId(v) << " " << std::scientific << std::setprecision(15)
-           << result[v] << std::endl;
-      } else {
-        os << frag.GetId(v) << " " << std::scientific << std::setprecision(15)
-           << result[v] * degree[v] << std::endl;
-      }
+      os << frag.GetId(v) << " " << std::scientific << std::setprecision(15)
+         << result[v] << std::endl;
     }
 #ifdef PROFILING
     VLOG(2) << "preprocess_time: " << preprocess_time << "s.";
@@ -73,21 +72,8 @@ class PageRankContext : public VertexDataContext<FRAG_T, double> {
 #endif
   }
 
-  void Finalize() override {
-    auto& frag = this->fragment();
-    auto inner_vertices = frag.InnerVertices();
-
-    for (auto v : inner_vertices) {
-      if (degree[v] == 0) {
-        this->SetValue(v, result[v]);
-      } else {
-        this->SetValue(v, result[v] * degree[v]);
-      }
-    }
-  }
-
   typename FRAG_T::template vertex_array_t<int> degree;
-  typename FRAG_T::template vertex_array_t<double> result;
+  typename FRAG_T::template vertex_array_t<double>& result;
   typename FRAG_T::template vertex_array_t<double> next_result;
 
 #ifdef PROFILING

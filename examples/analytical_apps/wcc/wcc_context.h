@@ -25,16 +25,17 @@ namespace grape {
  * @tparam FRAG_T
  */
 template <typename FRAG_T>
-class WCCContext : public VertexDataContext<FRAG_T, typename FRAG_T::oid_t> {
+class WCCContext : public VertexDataContext<FRAG_T, typename FRAG_T::vid_t> {
  public:
   using oid_t = typename FRAG_T::oid_t;
   using vid_t = typename FRAG_T::vid_t;
 
+  explicit WCCContext(const FRAG_T& fragment)
+      : VertexDataContext<FRAG_T, typename FRAG_T::vid_t>(fragment, true),
+        comp_id(this->data()) {}
+
   void Init(ParallelMessageManager& messages) {
     auto &frag = this->fragment();
-    auto vertices = frag.Vertices();
-
-    comp_id.Init(vertices);
 
     curr_modified.init(frag.GetVerticesNum());
     next_modified.init(frag.GetVerticesNum());
@@ -53,21 +54,7 @@ class WCCContext : public VertexDataContext<FRAG_T, typename FRAG_T::oid_t> {
 #endif
   }
 
-  void Finalize() override {
-    auto& frag = this->fragment();
-    auto inner_vertices = frag.InnerVertices();
-
-    for (auto v : inner_vertices) {
-      this->SetValue(v, comp_id[v]);
-    }
-#ifdef PROFILING
-    VLOG(2) << "preprocess_time: " << preprocess_time << "s.";
-    VLOG(2) << "eval_time: " << eval_time << "s.";
-    VLOG(2) << "postprocess_time: " << postprocess_time << "s.";
-#endif
-  }
-
-  typename FRAG_T::template vertex_array_t<vid_t> comp_id;
+  typename FRAG_T::template vertex_array_t<vid_t>& comp_id;
 
   Bitset curr_modified, next_modified;
 

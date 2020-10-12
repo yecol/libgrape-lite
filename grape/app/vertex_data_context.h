@@ -44,7 +44,7 @@ class VertexDataContext : public ContextBase {
 
   std::string context_type() const override { return CONTEXT_TYPE_VERTEX_DATA; }
 
-  vertex_array_t& data() { return data_; }
+  inline vertex_array_t& data() { return data_; }
 
  private:
   const fragment_t& fragment_;

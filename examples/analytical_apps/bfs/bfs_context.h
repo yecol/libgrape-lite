@@ -33,13 +33,16 @@ class BFSContext : public VertexDataContext<FRAG_T, int64_t> {
   using oid_t = typename FRAG_T::oid_t;
   using vid_t = typename FRAG_T::vid_t;
 
+  explicit BFSContext(const FRAG_T& fragment)
+      : VertexDataContext<FRAG_T, int64_t>(fragment),
+        partial_result(this->data()) {}
+
   void Init(ParallelMessageManager& messages,
             oid_t src_id) {
     auto &frag = this->fragment();
-    auto vertices = frag.Vertices();
 
     source_id = src_id;
-    partial_result.Init(vertices, std::numeric_limits<depth_type>::max());
+    partial_result.SetValue(std::numeric_limits<depth_type>::max());
     avg_degree = static_cast<double>(frag.GetEdgeNum()) /
                  static_cast<double>(frag.GetInnerVerticesNum());
 
@@ -64,17 +67,8 @@ class BFSContext : public VertexDataContext<FRAG_T, int64_t> {
 #endif
   }
 
-  void Finalize() override {
-    auto &frag = this->fragment();
-    auto inner_vertices = frag.InnerVertices();
-
-    for (auto v : inner_vertices) {
-      this->SetValue(v, partial_result[v]);
-    }
-  }
-
   oid_t source_id;
-  typename FRAG_T::template vertex_array_t<depth_type> partial_result;
+  typename FRAG_T::template vertex_array_t<depth_type>& partial_result;
   DenseVertexSet<vid_t> curr_inner_updated, next_inner_updated;
 
   depth_type current_depth = 0;

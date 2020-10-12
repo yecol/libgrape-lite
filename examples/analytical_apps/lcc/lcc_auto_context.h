@@ -33,6 +33,9 @@ class LCCAutoContext : public VertexDataContext<FRAG_T, double> {
   using oid_t = typename FRAG_T::oid_t;
   using vid_t = typename FRAG_T::vid_t;
 
+  explicit LCCAutoContext(const FRAG_T& fragment)
+      : VertexDataContext<FRAG_T, double>(fragment) {}
+
   void Init(AutoParallelMessageManager<FRAG_T>& messages) {
     auto &frag = this->fragment();
     auto vertices = frag.Vertices();
@@ -74,23 +77,6 @@ class LCCAutoContext : public VertexDataContext<FRAG_T, double> {
                 (static_cast<int64_t>(global_degree[v]) - 1));
         os << frag.GetId(v) << " " << std::scientific << std::setprecision(15)
            << re << std::endl;
-      }
-    }
-  }
-
-  void Finalize() override {
-    auto& frag = this->fragment();
-    auto inner_vertices = frag.InnerVertices();
-
-    for (auto v : inner_vertices) {
-      if (global_degree[v] == 0 || global_degree[v] == 1) {
-        this->SetValue(v, 0.0);
-      } else {
-        double re = 2.0 * (tricnt[v]) /
-            (static_cast<int64_t>(global_degree[v]) *
-                (static_cast<int64_t>(global_degree[v]) - 1));
-
-        this->SetValue(v, re);
       }
     }
   }

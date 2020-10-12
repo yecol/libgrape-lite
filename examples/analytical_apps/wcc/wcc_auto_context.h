@@ -20,6 +20,11 @@ limitations under the License.
 
 #include <limits>
 #include <vector>
+#ifdef WCC_USE_GID
+#define cid_t vid_t
+#else
+#define cid_t oid_t
+#endif
 
 namespace grape {
 
@@ -30,17 +35,15 @@ namespace grape {
  */
 template <typename FRAG_T>
 class WCCAutoContext
-    : public VertexDataContext<FRAG_T, typename FRAG_T::oid_t> {
+    : public VertexDataContext<FRAG_T, typename FRAG_T::cid_t> {
   using oid_t = typename FRAG_T::oid_t;
   using vid_t = typename FRAG_T::vid_t;
   using vertex_t = typename FRAG_T::vertex_t;
 
  public:
-#ifdef WCC_USE_GID
-  using cid_t = vid_t;
-#else
-  using cid_t = oid_t;
-#endif
+  explicit WCCAutoContext(const FRAG_T& fragment)
+      : VertexDataContext<FRAG_T, typename FRAG_T::cid_t>(fragment, true),
+        global_cluster_id(this->data()) {}
 
   void Init(AutoParallelMessageManager<FRAG_T>& messages) {
     auto& frag = this->fragment();
@@ -66,15 +69,6 @@ class WCCAutoContext
     auto inner_vertices = frag.InnerVertices();
     for (auto v : inner_vertices) {
       os << frag.GetId(v) << " " << global_cluster_id.GetValue(v) << std::endl;
-    }
-  }
-
-  void Finalize() override {
-    auto& frag = this->fragment();
-    auto inner_vertices = frag.InnerVertices();
-
-    for (auto v : inner_vertices) {
-      this->SetValue(v, global_cluster_id.GetValue(v));
     }
   }
 

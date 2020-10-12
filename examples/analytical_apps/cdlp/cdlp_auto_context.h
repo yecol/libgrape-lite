@@ -36,6 +36,10 @@ class CDLPAutoContext
   using label_t = oid_t;
 #endif
 
+  explicit CDLPAutoContext(const FRAG_T& fragment)
+      : VertexDataContext<FRAG_T, typename FRAG_T::oid_t>(fragment, true),
+        labels(this->data()) {}
+
   void Init(AutoParallelMessageManager<FRAG_T>& messages, int max_round) {
     auto& frag = this->fragment();
     auto vertices = frag.Vertices();
@@ -79,15 +83,6 @@ class CDLPAutoContext
 
     for (auto v : inner_vertices) {
       os << frag.GetId(v) << " " << labels[v] << std::endl;
-    }
-  }
-
-  void Finalize() override {
-    auto& frag = this->fragment();
-    auto inner_vertices = frag.InnerVertices();
-
-    for (auto v : inner_vertices) {
-      this->SetValue(v, labels[v]);
     }
   }
 

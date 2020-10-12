@@ -83,6 +83,14 @@ class PageRankAuto : public AutoAppBase<FRAG_T, PageRankAutoContext<FRAG_T>>,
 
     ++ctx.step;
     if (ctx.step > ctx.max_round) {
+      auto& degree = ctx.degree;
+      auto& results = ctx.results;
+
+      for (auto v : inner_vertices) {
+        if (degree[v] != 0) {
+          results[v] *= degree[v];
+        }
+      }
       return;
     }
 
