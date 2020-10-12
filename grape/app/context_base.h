@@ -29,7 +29,7 @@ namespace grape {
  */
 class ContextBase {
  public:
-  using data_t = grape::EmptyType;
+  using data_t = void;
 
   ContextBase() = default;
   virtual ~ContextBase() = default;
