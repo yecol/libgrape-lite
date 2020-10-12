@@ -35,6 +35,9 @@ class SamplerContext : public VertexDataContext<FRAG_T, std::string> {
   using vertex_t = typename FRAG_T::vertex_t;
 
  public:
+  explicit SamplerContext(const FRAG_T& fragment)
+      : VertexDataContext<FRAG_T, std::string>(fragment) {}
+
   void Init(ParallelMessageManager& messages, const std::string& strategy,
             const std::string& sampler_hop_and_num,
             const std::vector<std::string>& queries) {
