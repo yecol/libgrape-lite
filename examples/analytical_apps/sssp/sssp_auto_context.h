@@ -34,8 +34,9 @@ class SSSPAutoContext : public VertexDataContext<FRAG_T, double> {
   using oid_t = typename FRAG_T::oid_t;
   using vid_t = typename FRAG_T::vid_t;
 
-  void Init(AutoParallelMessageManager<FRAG_T>& messages,
-            oid_t source_id) {
+  SSSPAutoContext() : partial_result(this->data()) {}
+
+  void Init(AutoParallelMessageManager<FRAG_T>& messages, oid_t source_id) {
     auto &frag = this->fragment();
     auto vertices = frag.Vertices();
 
@@ -67,17 +68,6 @@ class SSSPAutoContext : public VertexDataContext<FRAG_T, double> {
         os << frag.GetId(v) << " " << std::scientific << std::setprecision(15)
            << d << std::endl;
       }
-    }
-  }
-
-  void Finalize() override {
-    auto &frag = this->fragment();
-    auto inner_vertices = frag.InnerVertices();
-
-    for (auto v : inner_vertices) {
-      double d = partial_result[v];
-
-      this->SetValue(v, d);
     }
   }
 

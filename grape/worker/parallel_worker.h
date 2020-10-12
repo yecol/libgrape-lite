@@ -75,7 +75,7 @@ class ParallelWorker {
     InitCommunicator(app_, comm_spec_.comm());
   }
 
-  void Finalize() { context_->Finalize(); }
+  void Finalize() {}
 
   template <class... Args>
   void Query(Args&&... args) {

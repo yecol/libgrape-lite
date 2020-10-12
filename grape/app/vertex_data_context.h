@@ -41,12 +41,6 @@ class VertexDataContext : public ContextBase {
 
   std::string context_type() const override { return CONTEXT_TYPE_VERTEX_DATA; }
 
-  void SetValue(const data_t& data) { data_.SetValue(data); }
-
-  void SetValue(vertex_t v, const data_t& data) { data_[v] = data; }
-
-  const data_t& GetValue(vertex_t v) const { return data_[v]; }
-
   vertex_array_t& data() { return data_; }
 
  private:

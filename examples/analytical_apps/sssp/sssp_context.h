@@ -35,6 +35,8 @@ class SSSPContext : public VertexDataContext<FRAG_T, double> {
   using oid_t = typename FRAG_T::oid_t;
   using vid_t = typename FRAG_T::vid_t;
 
+  SSSPContext() : partial_result(this->data()) {}
+
   void Init(ParallelMessageManager& messages,
             oid_t source_id) {
     auto &frag = this->fragment();
@@ -66,22 +68,6 @@ class SSSPContext : public VertexDataContext<FRAG_T, double> {
         os << frag.GetId(v) << " " << std::scientific << std::setprecision(15)
            << d << std::endl;
       }
-    }
-#ifdef PROFILING
-    VLOG(2) << "preprocess_time: " << preprocess_time << "s.";
-    VLOG(2) << "exec_time: " << exec_time << "s.";
-    VLOG(2) << "postprocess_time: " << postprocess_time << "s.";
-#endif
-  }
-
-  void Finalize() override {
-    auto &frag = this->fragment();
-    auto inner_vertices = frag.InnerVertices();
-
-    for (auto v : inner_vertices) {
-      double d = partial_result[v];
-
-      this->SetValue(v, d);
     }
 #ifdef PROFILING
     VLOG(2) << "preprocess_time: " << preprocess_time << "s.";

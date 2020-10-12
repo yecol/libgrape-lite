@@ -31,18 +31,10 @@ namespace grape {
  */
 class ContextBase {
  public:
-  using data_t = EmptyType;
-
   ContextBase() = default;
   virtual ~ContextBase() = default;
 
   virtual std::string context_type() const = 0;
-
-  /**
-   * @brief This method will be invoked when app has been finished.
-   * User may override this method to cleanup or save result.
-   */
-  virtual void Finalize() {}
 
   /**
    * @brief Output function to implement for result output.
