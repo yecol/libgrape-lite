@@ -36,7 +36,7 @@ class SSSPContext : public VertexDataContext<FRAG_T, double> {
   using vid_t = typename FRAG_T::vid_t;
 
   explicit SSSPContext(const FRAG_T& fragment)
-      : VertexDataContext<FRAG_T, double>(fragment),
+      : VertexDataContext<FRAG_T, double>(fragment, true),
         partial_result(this->data()) {}
 
   void Init(ParallelMessageManager& messages,
