@@ -34,7 +34,7 @@ class ContextBase {
   ContextBase() = default;
   virtual ~ContextBase() = default;
 
-  virtual std::string context_type() const = 0;
+  virtual const char* context_type() const = 0;
 
   /**
    * @brief Output function to implement for result output.

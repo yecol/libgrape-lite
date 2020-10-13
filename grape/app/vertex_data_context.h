@@ -42,7 +42,7 @@ class VertexDataContext : public ContextBase {
 
   const fragment_t& fragment() { return fragment_; }
 
-  std::string context_type() const override { return CONTEXT_TYPE_VERTEX_DATA; }
+  const char* context_type() const override { return CONTEXT_TYPE_VERTEX_DATA; }
 
   inline vertex_array_t& data() { return data_; }
 
