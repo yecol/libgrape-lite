@@ -15,8 +15,10 @@ limitations under the License.
 
 #ifndef GRAPE_APP_VERTEX_DATA_CONTEXT_H_
 #define GRAPE_APP_VERTEX_DATA_CONTEXT_H_
+
 #include "grape/app/context_base.h"
 #include "grape/utils/vertex_array.h"
+
 #define CONTEXT_TYPE_VERTEX_DATA "vertex_data"
 
 namespace grape {
