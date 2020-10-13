@@ -16,17 +16,20 @@ limitations under the License.
 #ifndef EXAMPLES_ANALYTICAL_APPS_WCC_WCC_AUTO_CONTEXT_H_
 #define EXAMPLES_ANALYTICAL_APPS_WCC_WCC_AUTO_CONTEXT_H_
 
-#include <grape/grape.h>
-
 #include <limits>
 #include <vector>
-#ifdef WCC_USE_GID
-#define cid_t vid_t
-#else
-#define cid_t oid_t
-#endif
+
+#include <grape/grape.h>
 
 namespace grape {
+
+#ifdef WCC_USE_GID
+template <typename FRAG_T>
+using WCCAutoContextType = VertexDataContext<FRAG_T, typename FRAG_T::vid_t>;
+#else
+template <typename FRAG_T>
+using WCCAutoContextType = VertexDataContext<FRAG_T, typename FRAG_T::oid_t>;
+#endif
 
 /**
  * @brief Context for the auto-parallel version of WCCAuto.
@@ -34,15 +37,15 @@ namespace grape {
  * @tparam FRAG_T
  */
 template <typename FRAG_T>
-class WCCAutoContext
-    : public VertexDataContext<FRAG_T, typename FRAG_T::cid_t> {
+class WCCAutoContext : public WCCAutoContextType<FRAG_T> {
   using oid_t = typename FRAG_T::oid_t;
   using vid_t = typename FRAG_T::vid_t;
   using vertex_t = typename FRAG_T::vertex_t;
+  using cid_t = typename WCCAutoContextType<FRAG_T>::data_t;
 
  public:
   explicit WCCAutoContext(const FRAG_T& fragment)
-      : VertexDataContext<FRAG_T, typename FRAG_T::cid_t>(fragment, true),
+      : WCCAutoContextType<FRAG_T>(fragment, true),
         global_cluster_id(this->data()) {}
 
   void Init(AutoParallelMessageManager<FRAG_T>& messages) {
