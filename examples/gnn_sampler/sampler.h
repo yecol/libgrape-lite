@@ -139,6 +139,19 @@ class Sampler : public ParallelAppBase<FRAG_T, SamplerContext<FRAG_T>>,
     if (cur_hop <= ctx.nums_of_hop.size()) {
       ctx.random_cache = for_caches;
       messages.ForceContinue();
+    } else {
+      auto& random_result = ctx.random_result;
+      auto& ctx_data = ctx.data();
+      vertex_t v;
+
+      for (auto& it : random_result) {
+        CHECK(frag.Gid2Vertex(it.first, v));
+        auto& oids = ctx_data[v];
+
+        for (auto gid : it.second) {
+          oids.push_back(frag.Gid2Oid(gid));
+        }
+      }
     }
 #ifdef PROFILING
     ctx.time_inceval_gen_send_msg += GetCurrentTime();

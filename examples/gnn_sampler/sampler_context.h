@@ -29,14 +29,21 @@ limitations under the License.
 
 namespace grape {
 template <typename FRAG_T>
-class SamplerContext : public grape::ContextBase<FRAG_T> {
+class SamplerContext
+    : public VertexDataContext<FRAG_T, std::vector<typename FRAG_T::oid_t>> {
   using oid_t = typename FRAG_T::oid_t;
   using vid_t = typename FRAG_T::vid_t;
+  using vertex_t = typename FRAG_T::vertex_t;
 
  public:
-  void Init(const FRAG_T& frag, ParallelMessageManager& messages,
-            const std::string& strategy, const std::string& sampler_hop_and_num,
+  explicit SamplerContext(const FRAG_T& fragment)
+      : VertexDataContext<FRAG_T, std::vector<typename FRAG_T::oid_t>>(
+            fragment) {}
+
+  void Init(ParallelMessageManager& messages, const std::string& strategy,
+            const std::string& sampler_hop_and_num,
             const std::vector<std::string>& queries) {
+    auto& frag = this->fragment();
 #ifdef PROFILING
     time_init -= GetCurrentTime();
 #endif
@@ -74,8 +81,11 @@ class SamplerContext : public grape::ContextBase<FRAG_T> {
 #endif
   }
 
-  void Output(const FRAG_T& frag, std::ostream& os) {
+  void Output(std::ostream& os) override {
+    auto& frag = this->fragment();
     auto t_begin = grape::GetCurrentTime();
+    vertex_t v;
+
     for (auto& it : random_result) {
       std::stringstream ss;
       ss << frag.Gid2Oid(it.first);

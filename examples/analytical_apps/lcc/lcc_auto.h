@@ -125,6 +125,20 @@ class LCCAuto : public AutoAppBase<FRAG_T, LCCAutoContext<FRAG_T>> {
       }
     } else if (ctx.stage == 2) {
       ctx.stage = 3;
+      auto& global_degree = ctx.global_degree;
+      auto& tricnt = ctx.tricnt;
+      auto& ctx_data = ctx.data();
+
+      for (auto v : inner_vertices) {
+        if (global_degree[v] == 0 || global_degree[v] == 1) {
+          ctx_data[v] = 0;
+        } else {
+          double re = 2.0 * (tricnt[v]) /
+                      (static_cast<int64_t>(global_degree[v]) *
+                       (static_cast<int64_t>(global_degree[v]) - 1));
+          ctx_data[v] = re;
+        }
+      }
     }
   }
 };

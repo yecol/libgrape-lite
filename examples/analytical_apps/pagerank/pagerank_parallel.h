@@ -107,6 +107,14 @@ class PageRankParallel
 
     ++ctx.step;
     if (ctx.step > ctx.max_round) {
+      auto& degree = ctx.degree;
+      auto& result = ctx.result;
+
+      for (auto v : inner_vertices) {
+        if (degree[v] != 0) {
+          result[v] *= degree[v];
+        }
+      }
       return;
     }
 

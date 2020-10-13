@@ -23,25 +23,33 @@ limitations under the License.
 
 namespace grape {
 
+#ifdef WCC_USE_GID
+template <typename FRAG_T>
+using WCCAutoContextType = VertexDataContext<FRAG_T, typename FRAG_T::vid_t>;
+#else
+template <typename FRAG_T>
+using WCCAutoContextType = VertexDataContext<FRAG_T, typename FRAG_T::oid_t>;
+#endif
+
 /**
  * @brief Context for the auto-parallel version of WCCAuto.
  *
  * @tparam FRAG_T
  */
 template <typename FRAG_T>
-class WCCAutoContext : public ContextBase<FRAG_T> {
+class WCCAutoContext : public WCCAutoContextType<FRAG_T> {
   using oid_t = typename FRAG_T::oid_t;
   using vid_t = typename FRAG_T::vid_t;
   using vertex_t = typename FRAG_T::vertex_t;
+  using cid_t = typename WCCAutoContextType<FRAG_T>::data_t;
 
  public:
-#ifdef WCC_USE_GID
-  using cid_t = vid_t;
-#else
-  using cid_t = oid_t;
-#endif
+  explicit WCCAutoContext(const FRAG_T& fragment)
+      : WCCAutoContextType<FRAG_T>(fragment, true),
+        global_cluster_id(this->data()) {}
 
-  void Init(const FRAG_T& frag, AutoParallelMessageManager<FRAG_T>& messages) {
+  void Init(AutoParallelMessageManager<FRAG_T>& messages) {
+    auto& frag = this->fragment();
     auto vertices = frag.Vertices();
     auto inner_vertices = frag.InnerVertices();
 
@@ -59,7 +67,8 @@ class WCCAutoContext : public ContextBase<FRAG_T> {
                                 MessageStrategy::kSyncOnOuterVertex);
   }
 
-  void Output(const FRAG_T& frag, std::ostream& os) {
+  void Output(std::ostream& os) override {
+    auto& frag = this->fragment();
     auto inner_vertices = frag.InnerVertices();
     for (auto v : inner_vertices) {
       os << frag.GetId(v) << " " << global_cluster_id.GetValue(v) << std::endl;

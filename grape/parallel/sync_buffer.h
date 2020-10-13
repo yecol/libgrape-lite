@@ -29,7 +29,7 @@ namespace grape {
  */
 class ISyncBuffer {
  public:
-  virtual ~ISyncBuffer() {}
+  virtual ~ISyncBuffer() = default;
 
   virtual void* data() = 0;
 
@@ -53,9 +53,10 @@ class ISyncBuffer {
 template <typename T, typename VID_T>
 class SyncBuffer : public ISyncBuffer {
  public:
-  SyncBuffer() {}
-  explicit SyncBuffer(VertexRange<VID_T> range)
-      : data_(range), updated_(range, false), range_(range) {}
+  SyncBuffer() : data_(internal_data_) {}
+
+  explicit SyncBuffer(VertexArray<T, VID_T>& data)
+      : data_(data) {}
 
   bool updated(size_t begin, size_t length) const override {
     auto iter = updated_.begin() + begin;
@@ -67,6 +68,7 @@ class SyncBuffer : public ISyncBuffer {
     }
     return false;
   }
+
   void* data() override {
     return reinterpret_cast<void*>(&data_[range_.begin()]);
   }
@@ -118,7 +120,8 @@ class SyncBuffer : public ISyncBuffer {
   }
 
  private:
-  VertexArray<T, VID_T> data_;
+  VertexArray<T, VID_T> internal_data_;
+  VertexArray<T, VID_T>& data_;
   VertexArray<bool, VID_T> updated_;
   VertexRange<VID_T> range_;
 
