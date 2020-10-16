@@ -194,7 +194,6 @@ class LCC : public ParallelAppBase<FRAG_T, LCCContext<FRAG_T>>,
       messages.ForceContinue();
     } else if (ctx.stage == 2) {
       ctx.stage = 3;
-
 #ifdef PROFILING
       ctx.preprocess_time -= GetCurrentTime();
 #endif
@@ -205,7 +204,8 @@ class LCC : public ParallelAppBase<FRAG_T, LCCContext<FRAG_T>>,
 #ifdef PROFILING
       ctx.preprocess_time += GetCurrentTime();
 #endif
-    } else {
+
+      // output result to context data
       auto& global_degree = ctx.global_degree;
       auto& tricnt = ctx.tricnt;
       auto& ctx_data = ctx.data();

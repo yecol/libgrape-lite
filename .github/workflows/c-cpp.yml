@@ -22,7 +22,8 @@ jobs:
       - name: Install Dependencies for Linux
         if: runner.os == 'Linux'
         run: |
-          sudo apt update -y
+          # microsoft repo in 18.04 is broken
+          # sudo apt update -y
           sudo apt install -y libmpich-dev libgoogle-glog-dev libgflags-dev librdkafka-dev
       - name: Install Dependencies for macOS
         if: runner.os == 'macOS'
