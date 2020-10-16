@@ -32,8 +32,6 @@ jobs:
           sudo scutil --set HostName my_computer.local
           echo '127.0.0.1       my_computer.local' | sudo tee -a /etc/hosts
           brew install mpich glog gflags librdkafka apache-arrow
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v2
       - name: Build
         run: |
           mkdir build

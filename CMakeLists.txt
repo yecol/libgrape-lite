@@ -219,7 +219,7 @@ add_custom_target(clformat
 # cpplint, check for readability with Google style
 # ------------------------------------------------------------------------------
 add_custom_target(cpplint
-  COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/misc/cpplint.py ${FILES_NEED_FORMAT}
+  COMMAND python2 ${CMAKE_CURRENT_SOURCE_DIR}/misc/cpplint.py ${FILES_NEED_FORMAT}
         COMMENT "Running cpplint check."
         VERBATIM)
 
