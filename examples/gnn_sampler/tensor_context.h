@@ -16,6 +16,7 @@ limitations under the License.
 #ifndef EXAMPLES_GNN_SAMPLER_TENSOR_CONTEXT_H_
 #define EXAMPLES_GNN_SAMPLER_TENSOR_CONTEXT_H_
 #include "arrow/tensor.h"
+
 #include "grape/app/context_base.h"
 
 #define CONTEXT_TYPE_TENSOR "tensor"
