@@ -75,7 +75,7 @@ class TensorContext : public ContextBase {
                             arrow::Tensor::Make(type_, buffer, shape_));
       return arrow::Status();
     }
-    return arrow::Status(arrow::StatusCode::Invalid, "Empty sharpe");
+    return arrow::Status(arrow::StatusCode::Invalid, "Empty shape");
   }
 
   const std::vector<int64_t>& shape() { return shape_; }

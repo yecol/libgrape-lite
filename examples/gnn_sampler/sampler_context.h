@@ -23,10 +23,11 @@ limitations under the License.
 #include <unordered_map>
 #include <vector>
 
-#include "examples/gnn_sampler/tensor_context.h"
 #include "flat_hash_map/flat_hash_map.hpp"
 #include "util.h"
 #include "xoroshiro/xoroshiro.hpp"
+
+#include "examples/gnn_sampler/tensor_context.h"
 
 namespace grape {
 template <typename FRAG_T>

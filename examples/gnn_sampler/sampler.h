@@ -141,20 +141,19 @@ class Sampler : public ParallelAppBase<FRAG_T, SamplerContext<FRAG_T>>,
       messages.ForceContinue();
     } else {
       auto& random_result = ctx.random_result;
-      std::shared_ptr<typename context_t::arrow_tensor_t> tensor;
-
-      for (auto& it : random_result) {
-        if (tensor == nullptr) {
-          std::vector<int64_t> shape{(int64_t) random_result.size(),
-                                     (int64_t)(it.second.size() + 1)};
-          CHECK(ctx.set_shape(shape).ok());
-          tensor = ctx.tensor();
-        }
+      if (!random_result.empty()) {
+        auto path_len = random_result.begin()->second.size();
+        std::vector<int64_t> shape{(int64_t) random_result.size(),
+                                   (int64_t)(path_len + 1)};
+        CHECK(ctx.set_shape(shape).ok());
         auto& data = ctx.data();
-        data.push_back(frag.Gid2Oid(it.first));
 
-        for (auto gid : it.second) {
-          data.push_back(frag.Gid2Oid(gid));
+        for (auto& it : random_result) {
+          data.push_back(frag.Gid2Oid(it.first));
+
+          for (auto gid : it.second) {
+            data.push_back(frag.Gid2Oid(gid));
+          }
         }
       }
     }
