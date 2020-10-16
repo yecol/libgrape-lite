@@ -23,22 +23,21 @@ limitations under the License.
 #include <unordered_map>
 #include <vector>
 
+#include "examples/gnn_sampler/tensor_context.h"
 #include "flat_hash_map/flat_hash_map.hpp"
 #include "util.h"
 #include "xoroshiro/xoroshiro.hpp"
 
 namespace grape {
 template <typename FRAG_T>
-class SamplerContext
-    : public VertexDataContext<FRAG_T, std::vector<typename FRAG_T::oid_t>> {
+class SamplerContext : public TensorContext<FRAG_T, typename FRAG_T::oid_t> {
   using oid_t = typename FRAG_T::oid_t;
   using vid_t = typename FRAG_T::vid_t;
   using vertex_t = typename FRAG_T::vertex_t;
 
  public:
   explicit SamplerContext(const FRAG_T& fragment)
-      : VertexDataContext<FRAG_T, std::vector<typename FRAG_T::oid_t>>(
-            fragment) {}
+      : TensorContext<FRAG_T, typename FRAG_T::oid_t>(fragment) {}
 
   void Init(ParallelMessageManager& messages, const std::string& strategy,
             const std::string& sampler_hop_and_num,
@@ -84,7 +83,6 @@ class SamplerContext
   void Output(std::ostream& os) override {
     auto& frag = this->fragment();
     auto t_begin = grape::GetCurrentTime();
-    vertex_t v;
 
     for (auto& it : random_result) {
       std::stringstream ss;

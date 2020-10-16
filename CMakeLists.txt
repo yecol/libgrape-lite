@@ -96,7 +96,7 @@ else ()
     include_directories(SYSTEM ${GFLAGS_INCLUDE_DIRS})
 endif ()
 
-# find jemalloc-----------------------------------------------------------------
+# find jemalloc------------------------------------------------------------------
 if (USE_JEMALLOC)
     include("cmake/FindJemalloc.cmake")
     if (NOT JEMALLOC_FOUND)
@@ -107,11 +107,18 @@ if (USE_JEMALLOC)
     endif ()
 endif ()
 
-# find rdkafka---------------------------------------------------------------------
+# find rdkafka-------------------------------------------------------------------
 include("cmake/FindRdkafka.cmake")
 if (NOT RDKAFKA_FOUND)
     message(STATUS "rdkafka not found, build without rdkafka")
 endif ()
+
+# find arrow---------------------------------------------------------------------
+include("cmake/FindArrow.cmake")
+if(NOT ARROW_FOUND)
+    message(STATUS "apache-arrow is required, build without arrow")
+endif()
+
 
 macro(install_libgrapelite_target target)
     # install
@@ -155,15 +162,17 @@ if (NOT GFLAGS_FOUND)
     message(WARNING "Disable gnn_sampler because gflags not found")
 elseif (NOT RDKAFKA_FOUND)
     message(WARNING "Disable gnn_sampler because rdkafka not found")
+elseif(NOT ARROW_FOUND)
+    message(WARNING "Disable gnn_sampler because arrow not found")
 else ()
     add_executable(gnn_sampler examples/gnn_sampler/run_sampler.cc)
     set_target_properties(gnn_sampler PROPERTIES OUTPUT_NAME run_sampler)
     target_include_directories(gnn_sampler PRIVATE
             examples/gnn_sampler
             examples/gnn_sampler/thirdparty
-            ${RDKAFKA_INCLUDE_DIR})
-    target_link_libraries(gnn_sampler grape-lite  ${MPI_CXX_LIBRARIES}
-            ${GLOG_LIBRARIES} ${GFLAGS_LIBRARIES} ${CMAKE_DL_LIBS} ${RDKAFKA_LIBRARIES})
+            ${RDKAFKA_INCLUDE_DIR} ${ARROW_INCLUDE_DIR})
+    target_link_libraries(gnn_sampler grape-lite ${MPI_CXX_LIBRARIES}
+            ${GLOG_LIBRARIES} ${GFLAGS_LIBRARIES} ${CMAKE_DL_LIBS} ${RDKAFKA_LIBRARIES} ${ARROW_SHARED_LIB})
     install_libgrapelite_target(gnn_sampler)
 endif ()
 

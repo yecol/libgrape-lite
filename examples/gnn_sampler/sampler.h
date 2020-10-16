@@ -16,14 +16,14 @@ limitations under the License.
 #ifndef EXAMPLES_GNN_SAMPLER_SAMPLER_H_
 #define EXAMPLES_GNN_SAMPLER_SAMPLER_H_
 
+#include <grape/parallel/parallel_engine.h>
+#include <grape/utils/concurrent_queue.h>
+
 #include <iomanip>
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
-
-#include <grape/parallel/parallel_engine.h>
-#include <grape/utils/concurrent_queue.h>
 
 #include "flat_hash_map/flat_hash_map.hpp"
 #include "fragment_indices.h"
@@ -141,15 +141,20 @@ class Sampler : public ParallelAppBase<FRAG_T, SamplerContext<FRAG_T>>,
       messages.ForceContinue();
     } else {
       auto& random_result = ctx.random_result;
-      auto& ctx_data = ctx.data();
-      vertex_t v;
+      std::shared_ptr<typename context_t::arrow_tensor_t> tensor;
 
       for (auto& it : random_result) {
-        CHECK(frag.Gid2Vertex(it.first, v));
-        auto& oids = ctx_data[v];
+        if (tensor == nullptr) {
+          std::vector<int64_t> shape{(int64_t) random_result.size(),
+                                     (int64_t)(it.second.size() + 1)};
+          CHECK(ctx.set_shape(shape).ok());
+          tensor = ctx.tensor();
+        }
+        auto& data = ctx.data();
+        data.push_back(frag.Gid2Oid(it.first));
 
         for (auto gid : it.second) {
-          oids.push_back(frag.Gid2Oid(gid));
+          data.push_back(frag.Gid2Oid(gid));
         }
       }
     }
