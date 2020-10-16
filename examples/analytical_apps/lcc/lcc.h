@@ -193,6 +193,7 @@ class LCC : public ParallelAppBase<FRAG_T, LCCContext<FRAG_T>>,
 #endif
       messages.ForceContinue();
     } else if (ctx.stage == 2) {
+      ctx.stage = 3;
 #ifdef PROFILING
       ctx.preprocess_time -= GetCurrentTime();
 #endif
