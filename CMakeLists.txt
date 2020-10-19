@@ -31,7 +31,7 @@ include_directories(thirdparty)
 # setting default cmake type to Release
 # ------------------------------------------------------------------------------
 
-SET(DEFAULT_BUILD_TYPE "Release")
+set(DEFAULT_BUILD_TYPE "Release")
 if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     message(STATUS "Setting build type to '${DEFAULT_BUILD_TYPE}' as none was specified.")
     set(CMAKE_BUILD_TYPE "${DEFAULT_BUILD_TYPE}" CACHE
@@ -56,14 +56,14 @@ set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
 if (APPLE)
-    SET(CMAKE_MACOSX_RPATH ON)
+    set(CMAKE_MACOSX_RPATH ON)
 else ()
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -Werror -Wl,-rpath,$ORIGIN")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -Werror -Wl,-rpath,$ORIGIN")
 endif ()
-SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g -fprofile-arcs -ftest-coverage")
-SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -g")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g -fprofile-arcs -ftest-coverage")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -g")
 
 if (WITH_ASAN)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer -O1")
@@ -167,10 +167,39 @@ else ()
     install_libgrapelite_target(gnn_sampler)
 endif ()
 
+set(EXAMPLES_DIR ${PROJECT_SOURCE_DIR}/examples)
+
+if (PROFILING)
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/thirdparty/atlarge-research-granula
+        DESTINATION include # target directory
+        FILES_MATCHING      # install only matched files
+        PATTERN "*.h"       # select header files
+)        
+endif()
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/thirdparty/flat_hash_map
+        DESTINATION include
+        FILES_MATCHING
+        PATTERN "*.h"
+)
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/grape
-        DESTINATION include                 # target directory
-        FILES_MATCHING                      # install only matched files
-        PATTERN "*.h"                       # select header files
+        DESTINATION include
+        FILES_MATCHING
+        PATTERN "*.h"
+)
+install(DIRECTORY ${EXAMPLES_DIR}/analytical_apps/bfs
+                  ${EXAMPLES_DIR}/analytical_apps/cdlp
+                  ${EXAMPLES_DIR}/analytical_apps/lcc
+                  ${EXAMPLES_DIR}/analytical_apps/pagerank
+                  ${EXAMPLES_DIR}/analytical_apps/sssp
+                  ${EXAMPLES_DIR}/analytical_apps/wcc
+        DESTINATION include/grape/analytical_apps
+        FILES_MATCHING
+        PATTERN "*.h"
+)
+install(DIRECTORY ${EXAMPLES_DIR}/gnn_sampler
+        DESTINATION include/grape/analytical_apps
+        FILES_MATCHING
+        PATTERN "*.h"
 )
 
 configure_file(libgrapelite-config.in.cmake
