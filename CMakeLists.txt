@@ -173,6 +173,17 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/grape
         PATTERN "*.h"                       # select header files
 )
 
+set(APPS_DIR ${PROJECT_SOURCE_DIR}/examples/analytical_apps)
+install(DIRECTORY ${APPS_DIR}/bfs
+                  ${APPS_DIR}/cdlp
+                  ${APPS_DIR}/lcc
+                  ${APPS_DIR}/pagerank
+                  ${APPS_DIR}/sssp
+                  ${APPS_DIR}/wcc
+        DESTINATION include/grape/apps
+        FILES_MATCHING
+        PATTERN "*.h")
+
 configure_file(libgrapelite-config.in.cmake
                "${PROJECT_BINARY_DIR}/libgrapelite-config.cmake" @ONLY
 )
