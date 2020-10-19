@@ -192,12 +192,12 @@ install(DIRECTORY ${EXAMPLES_DIR}/analytical_apps/bfs
                   ${EXAMPLES_DIR}/analytical_apps/pagerank
                   ${EXAMPLES_DIR}/analytical_apps/sssp
                   ${EXAMPLES_DIR}/analytical_apps/wcc
-        DESTINATION include/grape/examples/analytical_apps
+        DESTINATION include/grape/analytical_apps
         FILES_MATCHING
         PATTERN "*.h"
 )
 install(DIRECTORY ${EXAMPLES_DIR}/gnn_sampler
-        DESTINATION include/grape/examples
+        DESTINATION include/grape/analytical_apps
         FILES_MATCHING
         PATTERN "*.h"
 )
