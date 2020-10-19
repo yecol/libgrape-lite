@@ -18,6 +18,7 @@ limitations under the License.
 
 #include <grape/grape.h>
 #include <grape/io/line_parser_base.h>
+#include <grape/app/void_context.h>
 
 #include <string>
 #include <unordered_map>
@@ -29,16 +30,15 @@ limitations under the License.
 
 namespace grape {
 template <typename FRAG_T>
-class SamplerContext
-    : public VertexDataContext<FRAG_T, std::vector<typename FRAG_T::oid_t>> {
-  using oid_t = typename FRAG_T::oid_t;
-  using vid_t = typename FRAG_T::vid_t;
-  using vertex_t = typename FRAG_T::vertex_t;
+class SamplerContext : public grape::VoidContext<FRAG_T> {
+  using fragment_t = FRAG_T;
+  using oid_t = typename fragment_t::oid_t;
+  using vid_t = typename fragment_t::vid_t;
+  using vertex_t = typename fragment_t::vertex_t;
 
  public:
-  explicit SamplerContext(const FRAG_T& fragment)
-      : VertexDataContext<FRAG_T, std::vector<typename FRAG_T::oid_t>>(
-            fragment) {}
+  explicit SamplerContext(const fragment_t& fragment)
+      : grape::VoidContext<FRAG_T>(fragment) {}
 
   void Init(ParallelMessageManager& messages, const std::string& strategy,
             const std::string& sampler_hop_and_num,
@@ -84,7 +84,6 @@ class SamplerContext
   void Output(std::ostream& os) override {
     auto& frag = this->fragment();
     auto t_begin = grape::GetCurrentTime();
-    vertex_t v;
 
     for (auto& it : random_result) {
       std::stringstream ss;
