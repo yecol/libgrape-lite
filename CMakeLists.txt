@@ -167,20 +167,24 @@ else ()
     install_libgrapelite_target(gnn_sampler)
 endif ()
 
+set(EXAMPLES_DIR ${PROJECT_SOURCE_DIR}/examples)
+
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/grape
         DESTINATION include                 # target directory
         FILES_MATCHING                      # install only matched files
         PATTERN "*.h"                       # select header files
 )
-
-set(APPS_DIR ${PROJECT_SOURCE_DIR}/examples/analytical_apps)
-install(DIRECTORY ${APPS_DIR}/bfs
-                  ${APPS_DIR}/cdlp
-                  ${APPS_DIR}/lcc
-                  ${APPS_DIR}/pagerank
-                  ${APPS_DIR}/sssp
-                  ${APPS_DIR}/wcc
-        DESTINATION include/grape/apps
+install(DIRECTORY ${EXAMPLES_DIR}/analytical_apps/bfs
+                  ${EXAMPLES_DIR}/analytical_apps/cdlp
+                  ${EXAMPLES_DIR}/analytical_apps/lcc
+                  ${EXAMPLES_DIR}/analytical_apps/pagerank
+                  ${EXAMPLES_DIR}/analytical_apps/sssp
+                  ${EXAMPLES_DIR}/analytical_apps/wcc
+        DESTINATION include/grape/examples/analytical_apps
+        FILES_MATCHING
+        PATTERN "*.h")
+install(DIRECTORY ${EXAMPLES_DIR}/gnn_sampler
+        DESTINATION include/grape/examples
         FILES_MATCHING
         PATTERN "*.h")
 
