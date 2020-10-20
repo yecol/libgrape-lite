@@ -16,7 +16,7 @@ limitations under the License.
 #ifndef GRAPE_APP_VOID_CONTEXT_H_
 #define GRAPE_APP_VOID_CONTEXT_H_
 #include "grape/app/context_base.h"
-#define CONTEXT_TYPE_VOID "void"
+#define CONTEXT_TYPE_VOID 0
 
 namespace grape {
 
@@ -26,11 +26,11 @@ class VoidContext : public ContextBase {
   using vertex_t = typename fragment_t::vertex_t;
 
  public:
+  static constexpr int context_type = CONTEXT_TYPE_VOID;
+
   explicit VoidContext(const fragment_t& fragment) : fragment_(fragment) {}
 
   const fragment_t& fragment() { return fragment_; }
-
-  const char* context_type() const override { return CONTEXT_TYPE_VOID; }
 
  private:
   const fragment_t& fragment_;
