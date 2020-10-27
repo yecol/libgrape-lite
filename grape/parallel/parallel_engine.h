@@ -137,25 +137,26 @@ class ParallelEngine {
    * @param iter_func Vertex program to be applied on each vertex.
    * @param chunk_size Vertices granularity to be scheduled by threads.
    */
-  template <typename ITER_FUNC_T, typename VID_T>
-  inline void ForEach(const VertexRange<VID_T>& range,
-                      const ITER_FUNC_T& iter_func, int chunk_size = 1024) {
+  template <typename ITER_FUNC_T, typename RANGE_T>
+  inline void ForEach(const RANGE_T& range, const ITER_FUNC_T& iter_func,
+                      int chunk_size = 1024) {
     std::vector<std::thread> threads(thread_num_);
-    std::atomic<VID_T> cur(range.begin().GetValue());
-    VID_T end = range.end().GetValue();
+    std::atomic<size_t> cur(0);
+    auto size = range.size();
 
     for (uint32_t i = 0; i < thread_num_; ++i) {
       threads[i] = std::thread(
-          [&cur, chunk_size, &iter_func, end](uint32_t tid) {
+          [&cur, chunk_size, &iter_func, &range, size](uint32_t tid) {
             while (true) {
-              VID_T cur_beg = std::min(cur.fetch_add(chunk_size), end);
-              VID_T cur_end = std::min(cur_beg + chunk_size, end);
+              auto cur_beg = std::min(cur.fetch_add(chunk_size), size);
+              auto cur_end = std::min(cur_beg + chunk_size, size);
               if (cur_beg == cur_end) {
                 break;
               }
-              VertexRange<VID_T> cur_range(cur_beg, cur_end);
-              for (auto u : cur_range) {
-                iter_func(tid, u);
+
+              for (auto cur_offset = cur_beg; cur_offset < cur_end;
+                   cur_offset++) {
+                iter_func(tid, range[cur_offset]);
               }
             }
           },
@@ -186,31 +187,32 @@ class ParallelEngine {
    * @param chunk_size Vertices granularity to be scheduled by threads.
    */
   template <typename INIT_FUNC_T, typename ITER_FUNC_T,
-            typename FINALIZE_FUNC_T, typename VID_T>
-  inline void ForEach(const VertexRange<VID_T>& range,
+            typename FINALIZE_FUNC_T, typename RANGE_T>
+  inline void ForEach(const RANGE_T& range,
                       const INIT_FUNC_T& init_func,
                       const ITER_FUNC_T& iter_func,
                       const FINALIZE_FUNC_T& finalize_func,
                       int chunk_size = 1024) {
     std::vector<std::thread> threads(thread_num_);
-    std::atomic<VID_T> cur(range.begin().GetValue());
-    VID_T end = range.end().GetValue();
+    std::atomic<size_t> cur(0);
+    auto size = range.size();
 
     for (uint32_t i = 0; i < thread_num_; ++i) {
       threads[i] = std::thread(
           [&cur, chunk_size, &init_func, &iter_func, &finalize_func,
-           end](uint32_t tid) {
+           size, &range](uint32_t tid) {
             init_func(tid);
 
             while (true) {
-              VID_T cur_beg = std::min(cur.fetch_add(chunk_size), end);
-              VID_T cur_end = std::min(cur_beg + chunk_size, end);
+              auto cur_beg = std::min(cur.fetch_add(chunk_size), size);
+              auto cur_end = std::min(cur_beg + chunk_size, size);
               if (cur_beg == cur_end) {
                 break;
               }
-              VertexRange<VID_T> cur_range(cur_beg, cur_end);
-              for (auto u : cur_range) {
-                iter_func(tid, u);
+
+              for (auto cur_offset = cur_beg; cur_offset < cur_end;
+                   cur_offset++) {
+                iter_func(tid, range[cur_offset]);
               }
             }
 
@@ -278,20 +280,24 @@ class ParallelEngine {
     }
   }
 
-  template <typename ITER_FUNC_T, typename VID_T>
-  inline void ForEach(const Bitset& bitset, const VertexRange<VID_T>& range,
+  template <typename ITER_FUNC_T, typename RANGE_T>
+  inline void ForEach(const Bitset& bitset, const RANGE_T& range,
                       const ITER_FUNC_T& iter_func, int chunk_size = 1024) {
+    using vid_t = typename RANGE_T::vid_t;
+    if (range.size() == 0) {
+      return;
+    }
+
     std::vector<std::thread> threads(thread_num_);
+    vid_t origin_begin = range[0].GetValue();
+    vid_t origin_end = range[range.size() - 1].GetValue();
 
-    VID_T origin_begin = range.begin().GetValue();
-    VID_T origin_end = range.end().GetValue();
-
-    VID_T batch_begin = (origin_begin + 63) / 64 * 64;
-    VID_T batch_end = origin_end / 64 * 64;
+    vid_t batch_begin = (origin_begin + 63) / 64 * 64;
+    vid_t batch_end = origin_end / 64 * 64;
 
     if (batch_begin >= origin_end || batch_end <= origin_begin) {
-      Vertex<VID_T> v(origin_begin);
-      Vertex<VID_T> end(origin_end);
+      Vertex<vid_t> v(origin_begin);
+      Vertex<vid_t> end(origin_end);
       while (v != end) {
         if (bitset.get_bit(v.GetValue())) {
           iter_func(0, v);
@@ -301,15 +307,15 @@ class ParallelEngine {
       return;
     }
 
-    std::atomic<VID_T> cur(batch_begin);
+    std::atomic<vid_t> cur(batch_begin);
 
     for (uint32_t i = 0; i < thread_num_; ++i) {
       threads[i] = std::thread(
           [&iter_func, &cur, chunk_size, &bitset, batch_begin, batch_end,
            origin_begin, origin_end, this](uint32_t tid) {
             if (tid == 0 && origin_begin < batch_begin) {
-              Vertex<VID_T> v(origin_begin);
-              Vertex<VID_T> end(batch_begin);
+              Vertex<vid_t> v(origin_begin);
+              Vertex<vid_t> end(batch_begin);
               while (v != end) {
                 if (bitset.get_bit(v.GetValue())) {
                   iter_func(tid, v);
@@ -318,8 +324,8 @@ class ParallelEngine {
               }
             }
             if (tid == (thread_num_ - 1) && batch_end < origin_end) {
-              Vertex<VID_T> v(batch_end);
-              Vertex<VID_T> end(origin_end);
+              Vertex<vid_t> v(batch_end);
+              Vertex<vid_t> end(origin_end);
               while (v != end) {
                 if (bitset.get_bit(v.GetValue())) {
                   iter_func(tid, v);
@@ -329,13 +335,13 @@ class ParallelEngine {
             }
             if (batch_begin < batch_end) {
               while (true) {
-                VID_T cur_beg = std::min(cur.fetch_add(chunk_size), batch_end);
-                VID_T cur_end = std::min(cur_beg + chunk_size, batch_end);
+                vid_t cur_beg = std::min(cur.fetch_add(chunk_size), batch_end);
+                vid_t cur_end = std::min(cur_beg + chunk_size, batch_end);
                 if (cur_beg == cur_end) {
                   break;
                 }
-                for (VID_T vid = cur_beg; vid < cur_end; vid += 64) {
-                  Vertex<VID_T> v(vid);
+                for (vid_t vid = cur_beg; vid < cur_end; vid += 64) {
+                  Vertex<vid_t> v(vid);
                   uint64_t word = bitset.get_word(vid);
                   while (word != 0) {
                     if (word & 1) {

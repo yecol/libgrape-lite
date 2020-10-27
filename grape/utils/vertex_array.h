@@ -124,7 +124,9 @@ bool operator==(Vertex<T> const& lhs, Vertex<T> const& rhs) {
 template <typename T>
 class VertexRange {
  public:
-  VertexRange() {}
+  using vid_t = T;
+
+  VertexRange() = default;
   VertexRange(T begin, T end) : begin_(begin), end_(end), size_(end - begin) {}
   VertexRange(const Vertex<T>& begin, const Vertex<T>& end)
       : begin_(begin), end_(end), size_(end.GetValue() - begin.GetValue()) {}
@@ -136,6 +138,10 @@ class VertexRange {
   inline const Vertex<T>& end() const { return end_; }
 
   inline size_t size() const { return size_; }
+
+  inline Vertex<T> operator[](size_t offset) const {
+    return Vertex<T>(begin_.GetValue() + offset);
+  }
 
   void Swap(VertexRange& rhs) {
     begin_.Swap(rhs.begin_);
@@ -151,7 +157,7 @@ class VertexRange {
 
  private:
   Vertex<T> begin_, end_;
-  size_t size_;
+  size_t size_{};
 };
 
 template <typename T, typename VID_T>
