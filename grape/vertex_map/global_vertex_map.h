@@ -131,8 +131,8 @@ class GlobalVertexMap : public VertexMapBase<OID_T, VID_T> {
     return false;
   }
 
-  const std::vector<OID_T>& GetOids(fid_t fid) {
-    return l2o_[fid];
+  VertexRange<VID_T> GetInnerVertices(fid_t fid) {
+    return VertexRange<VID_T>(0, l2o_[fid]);
   }
 
   void Construct() {
