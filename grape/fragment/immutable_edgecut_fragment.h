@@ -108,6 +108,7 @@ class ImmutableEdgecutFragment
   using oid_t = OID_T;
   using vdata_t = VDATA_T;
   using edata_t = EDATA_T;
+  using vertices_t = VertexRange<vid_t>;
   template <typename DATA_T>
   using vertex_array_t = VertexArray<DATA_T, vid_t>;
   using vertex_map_t = GlobalVertexMap<oid_t, vid_t>;
@@ -613,19 +614,17 @@ class ImmutableEdgecutFragment
     return vm_ptr_->GetTotalVertexSize();
   }
 
-  inline VertexRange<VID_T> Vertices() const override {
-    return VertexRange<VID_T>(0, tvnum_);
+  inline vertices_t Vertices() const override { return vertices_t(0, tvnum_); }
+
+  inline vertices_t InnerVertices() const override {
+    return vertices_t(0, ivnum_);
   }
 
-  inline VertexRange<VID_T> InnerVertices() const override {
-    return VertexRange<VID_T>(0, ivnum_);
+  inline vertices_t OuterVertices() const override {
+    return vertices_t(ivnum_, tvnum_);
   }
 
-  inline VertexRange<VID_T> OuterVertices() const override {
-    return VertexRange<VID_T>(ivnum_, tvnum_);
-  }
-
-  inline VertexRange<VID_T> OuterVertices(fid_t fid) const {
+  inline vertices_t OuterVertices(fid_t fid) const {
     return outer_vertices_of_frag_[fid];
   }
 
@@ -766,7 +765,7 @@ class ImmutableEdgecutFragment
     return ovgid_[v.GetValue() - ivnum_];
   }
   inline VID_T GetInnerVertexGid(const vertex_t& v) const override {
-    return (v.GetValue() | ((VID_T)fid_ << fid_offset_));
+    return (v.GetValue() | ((VID_T) fid_ << fid_offset_));
   }
 
   /**
@@ -1090,11 +1089,11 @@ class ImmutableEdgecutFragment
     return mirrors_of_frag_[fid];
   }
 
-  inline const VertexRange<VID_T>& MirrorsRange(fid_t fid) const {
+  inline const vertices_t& MirrorsRange(fid_t fid) const {
     return mirrors_range_[fid];
   }
 
-  void SetupMirrorInfo(fid_t fid, const VertexRange<VID_T>& range,
+  void SetupMirrorInfo(fid_t fid, const vertices_t& range,
                        const std::vector<VID_T>& gid_list) {
     mirrors_range_[fid].SetRange(range.begin().GetValue(),
                                  range.end().GetValue());
@@ -1232,7 +1231,7 @@ class ImmutableEdgecutFragment
       }
       fid_offset = (sizeof(T) * 8) - i;
     }
-    id_mask = ((T)1 << fid_offset) - (T)1;
+    id_mask = ((T) 1 << fid_offset) - (T) 1;
   }
 
   std::shared_ptr<vertex_map_t> vm_ptr_;
@@ -1247,9 +1246,9 @@ class ImmutableEdgecutFragment
   Array<nbr_t*, Allocator<nbr_t*>> ieoffset_, oeoffset_;
   Array<VDATA_T, Allocator<VDATA_T>> vdata_;
 
-  std::vector<VertexRange<VID_T>> outer_vertices_of_frag_;
+  std::vector<vertices_t> outer_vertices_of_frag_;
 
-  std::vector<VertexRange<VID_T>> mirrors_range_;
+  std::vector<vertices_t> mirrors_range_;
   std::vector<std::vector<vertex_t>> mirrors_of_frag_;
 
   Array<fid_t, Allocator<fid_t>> idst_, odst_, iodst_;

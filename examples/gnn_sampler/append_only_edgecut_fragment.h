@@ -16,15 +16,6 @@ limitations under the License.
 #ifndef EXAMPLES_GNN_SAMPLER_APPEND_ONLY_EDGECUT_FRAGMENT_H_
 #define EXAMPLES_GNN_SAMPLER_APPEND_ONLY_EDGECUT_FRAGMENT_H_
 
-#include <algorithm>
-#include <map>
-#include <memory>
-#include <set>
-#include <string>
-#include <tuple>
-#include <utility>
-#include <vector>
-
 #include <grape/config.h>
 #include <grape/fragment/edgecut_fragment_base.h>
 #include <grape/fragment/ev_fragment_loader.h>
@@ -43,6 +34,15 @@ limitations under the License.
 #include <grape/utils/vertex_array.h>
 #include <grape/vertex_map/global_vertex_map.h>
 #include <grape/worker/comm_spec.h>
+
+#include <algorithm>
+#include <map>
+#include <memory>
+#include <set>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
 
 #include "flat_hash_map/flat_hash_map.hpp"
 #include "fragment_indices.h"
@@ -278,7 +278,7 @@ class AppendOnlyEdgecutFragment
   using nbr_vertex_t = NbrVertex<VID_T, EDATA_T>;
   using nbr_iterator_t = NbrIterator<VID_T, EDATA_T>;
   using vertex_t = Vertex<VID_T>;
-  using vertex_range_t = VertexRange<VID_T>;
+  using vertices_t = VertexRange<VID_T>;
   using adj_list_t = AdjList<VID_T, EDATA_T>;
   using const_adj_list_t = ConstAdjList<VID_T, EDATA_T>;
   using vid_t = VID_T;
@@ -727,17 +727,15 @@ class AppendOnlyEdgecutFragment
 
   vid_t GetOuterVerticesNum() const override { return ovnum_; }
 
-  vertex_range_t InnerVertices() const override {
-    return vertex_range_t(0, ivnum_);
+  vertices_t InnerVertices() const override { return vertices_t(0, ivnum_); }
+
+  vertices_t OuterVertices() const override {
+    return vertices_t(id_mask_ - ovnum_ + 1, id_mask_ + 1);
   }
 
-  vertex_range_t OuterVertices() const override {
-    return vertex_range_t(id_mask_ - ovnum_ + 1, id_mask_ + 1);
-  }
+  vertices_t OuterVertices(fid_t fid) const { return vertices_t(0, 0); }
 
-  vertex_range_t OuterVertices(fid_t fid) const { return vertex_range_t(0, 0); }
-
-  vertex_range_t Vertices() const override { return vertex_range_t(0, 0); }
+  vertices_t Vertices() const override { return vertices_t(0, 0); }
 
   bool IsInnerVertex(const vertex_t& v) const override {
     return (v.GetValue() < ivnum_);
@@ -924,7 +922,7 @@ class AppendOnlyEdgecutFragment
     return fragment_indices_;
   }
 
-  void SetupMirrorInfo(fid_t fid, const VertexRange<vid_t>& range,
+  void SetupMirrorInfo(fid_t fid, const vertices_t& range,
                        const std::vector<vid_t>& gid_list) {}
 
  private:
