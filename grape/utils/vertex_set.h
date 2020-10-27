@@ -20,7 +20,6 @@ limitations under the License.
 
 #include "grape/utils/bitset.h"
 #include "grape/utils/vertex_array.h"
-#include "grape/utils/vertex_vector.h"
 
 namespace grape {
 

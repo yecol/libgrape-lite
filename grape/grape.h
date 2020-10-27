@@ -27,7 +27,6 @@ limitations under the License.
 #include "grape/parallel/parallel_message_manager.h"
 #include "grape/utils/atomic_ops.h"
 #include "grape/utils/vertex_array.h"
-#include "grape/utils/vertex_vector.h"
 #include "grape/worker/auto_worker.h"
 #include "grape/worker/batch_shuffle_worker.h"
 #include "grape/worker/parallel_worker.h"
