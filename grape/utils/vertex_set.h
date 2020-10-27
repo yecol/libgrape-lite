@@ -39,13 +39,6 @@ class DenseVertexSet {
         end_(range.end().GetValue()),
         bs_(end_ - beg_) {}
 
-  explicit DenseVertexSet(const VertexVector<VID_T>& vertices) {
-    if (vertices.size() == 0) return;
-    beg_ = vertices[0].GetValue();
-    end_ = vertices[vertices.size() - 1].GetValue();
-    bs_.init(end_ - beg_ + 1);
-  }
-
   ~DenseVertexSet() = default;
 
   void Init(const VertexRange<VID_T>& range, int thread_num = 1) {
