@@ -51,18 +51,6 @@ class DenseVertexSet {
     }
   }
 
-  void Init(const VertexVector<VID_T>& vertices, int thread_num = 1) {
-    if (vertices.size() == 0) return;
-    beg_ = vertices[0].GetValue();
-    end_ = vertices[vertices.size() - 1].GetValue();
-    bs_.init(end_ - beg_ + 1);
-    if (thread_num == 1) {
-      bs_.clear();
-    } else {
-      bs_.parallel_clear(thread_num);
-    }
-  }
-
   void Insert(Vertex<VID_T> u) { bs_.set_bit(u.GetValue() - beg_); }
 
   bool InsertWithRet(Vertex<VID_T> u) {
