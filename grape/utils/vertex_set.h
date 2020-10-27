@@ -20,10 +20,116 @@ limitations under the License.
 
 #include "grape/utils/bitset.h"
 #include "grape/utils/vertex_array.h"
-#include "grape/utils/vertex_vector.h"
 
 namespace grape {
+/**
+ * @brief A discontinuous vertices collection representation. An increasing
+ * labeled(but no need to be continuous) vertices must be provided to construct
+ * the SparseVertexSet.
+ *
+ * @tparam T Vertex ID type.
+ */
+template <typename VID_T>
+class SparseVertexSet {
+ public:
+  SparseVertexSet() = default;
 
+  explicit SparseVertexSet(std::vector<Vertex<VID_T>>& vertices)
+      : vertices_(vertices) {
+    // verify increasing order
+    if (vertices.size() > 0) {
+      auto prev = vertices[0];
+      for (auto curr : vertices) {
+        CHECK_LE(prev.GetValue(), curr.GetValue());
+        prev = curr;
+      }
+    }
+  }
+
+  inline typename std::vector<Vertex<VID_T>>::iterator begin() {
+    return vertices_.begin();
+  }
+
+  inline typename std::vector<Vertex<VID_T>>::iterator end() {
+    return vertices_.end();
+  }
+
+  inline typename std::vector<Vertex<VID_T>>::const_iterator cbegin() const {
+    return vertices_.cbegin();
+  }
+
+  inline typename std::vector<Vertex<VID_T>>::const_iterator cend() const {
+    return vertices_.cend();
+  }
+
+  void Insert(Vertex<VID_T> u) { InsertWithRet(u); }
+
+  bool InsertWithRet(Vertex<VID_T> u) {
+    size_t idx = binarySearch(u);
+
+    if (idx == vertices_.size()) {
+      vertices_.push_back(u);
+      return true;
+    }
+
+    if (vertices_[idx] != u) {
+      vertices_.insert(vertices_.begin() + idx, u);
+      return true;
+    }
+
+    return false;
+  }
+
+  void Erase(Vertex<VID_T> u) {
+    EraseWithRet(u);
+  }
+
+  bool EraseWithRet(Vertex<VID_T> u) {
+    size_t idx = binarySearch(u);
+
+    if (idx == vertices_.size()) {
+      return false;
+    }
+
+    if (vertices_[idx] == u) {
+      vertices_.erase(vertices_.begin() + idx);
+      return true;
+    }
+    return false;
+  }
+
+  Vertex<VID_T> operator[](size_t idx) { return vertices_[idx]; }
+
+  Vertex<VID_T> operator[](size_t idx) const { return vertices_[idx]; }
+
+  inline size_t size() const { return vertices_.size(); }
+
+  void Swap(SparseVertexSet& rhs) {
+    using std::swap;
+    swap(vertices_, rhs.vertices_);
+  }
+
+ private:
+  std::vector<Vertex<VID_T>> vertices_;
+
+  size_t binarySearch(Vertex<VID_T> u) {
+    size_t l = 0, r = vertices_.size();
+
+    while (l < r) {
+      size_t m = l + (r - l) / 2;
+      auto v = vertices_[m];
+
+      if (v == u) {
+        return m;
+      } else if (v < u) {
+        l = m + 1;
+      } else {
+        r = m;
+      }
+    }
+    return l;
+  }
+};
 /**
  * @brief A vertex set with dense vertices.
  *
@@ -39,13 +145,6 @@ class DenseVertexSet {
         end_(range.end().GetValue()),
         bs_(end_ - beg_) {}
 
-  explicit DenseVertexSet(const VertexVector<VID_T>& vertices) {
-    if (vertices.size() == 0) return;
-    beg_ = vertices[0].GetValue();
-    end_ = vertices[vertices.size() - 1].GetValue();
-    bs_.init(end_ - beg_ + 1);
-  }
-
   ~DenseVertexSet() = default;
 
   void Init(const VertexRange<VID_T>& range, int thread_num = 1) {
@@ -59,8 +158,9 @@ class DenseVertexSet {
     }
   }
 
-  void Init(const VertexVector<VID_T>& vertices, int thread_num = 1) {
-    if (vertices.size() == 0) return;
+  void Init(const SparseVertexSet<VID_T>& vertices, int thread_num = 1) {
+    if (vertices.size() == 0)
+      return;
     beg_ = vertices[0].GetValue();
     end_ = vertices[vertices.size() - 1].GetValue();
     bs_.init(end_ - beg_ + 1);
