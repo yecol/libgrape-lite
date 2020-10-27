@@ -65,34 +65,32 @@ class SparseVertexSet {
   void Insert(Vertex<VID_T> u) { InsertWithRet(u); }
 
   bool InsertWithRet(Vertex<VID_T> u) {
-    size_t idx = binarySearch(u);
+    auto it = std::lower_bound(vertices_.begin(), vertices_.end(), u);
 
-    if (idx == vertices_.size()) {
+    if (it == vertices_.end()) {
       vertices_.push_back(u);
       return true;
     }
 
-    if (vertices_[idx] != u) {
-      vertices_.insert(vertices_.begin() + idx, u);
+    if (*it != u) {
+      vertices_.insert(it, u);
       return true;
     }
 
     return false;
   }
 
-  void Erase(Vertex<VID_T> u) {
-    EraseWithRet(u);
-  }
+  void Erase(Vertex<VID_T> u) { EraseWithRet(u); }
 
   bool EraseWithRet(Vertex<VID_T> u) {
-    size_t idx = binarySearch(u);
+    auto it = std::lower_bound(vertices_.begin(), vertices_.end(), u);
 
-    if (idx == vertices_.size()) {
+    if (it == vertices_.end()) {
       return false;
     }
 
-    if (vertices_[idx] == u) {
-      vertices_.erase(vertices_.begin() + idx);
+    if (*it == u) {
+      vertices_.erase(it);
       return true;
     }
     return false;
@@ -111,24 +109,6 @@ class SparseVertexSet {
 
  private:
   std::vector<Vertex<VID_T>> vertices_;
-
-  size_t binarySearch(Vertex<VID_T> u) {
-    size_t l = 0, r = vertices_.size();
-
-    while (l < r) {
-      size_t m = l + (r - l) / 2;
-      auto v = vertices_[m];
-
-      if (v == u) {
-        return m;
-      } else if (v < u) {
-        l = m + 1;
-      } else {
-        r = m;
-      }
-    }
-    return l;
-  }
 };
 /**
  * @brief A vertex set with dense vertices.
