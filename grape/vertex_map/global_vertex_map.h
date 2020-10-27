@@ -131,10 +131,6 @@ class GlobalVertexMap : public VertexMapBase<OID_T, VID_T> {
     return false;
   }
 
-  VertexRange<VID_T> GetInnerVertices(fid_t fid) {
-    return VertexRange<VID_T>(0, l2o_[fid]);
-  }
-
   void Construct() {
     const CommSpec& comm_spec = Base::GetCommSpec();
     int worker_id = comm_spec.worker_id();
