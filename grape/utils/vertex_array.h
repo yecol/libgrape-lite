@@ -164,37 +164,31 @@ class VertexRange {
 template <typename T>
 class VertexVector {
  public:
+  VertexVector()
+      : dummy(std::make_shared<const std::vector<Vertex<T>>>()),
+        vertices_(*dummy) {}
+
   explicit VertexVector(const std::vector<Vertex<T>>& vertices)
       : vertices_(vertices) {}
 
-  inline typename std::vector<Vertex<T>>::iterator begin() {
-    return vertices_.begin();
+  inline typename std::vector<Vertex<T>>::const_iterator begin() const {
+    return vertices_.get().begin();
   }
 
-  inline typename std::vector<Vertex<T>>::iterator end() {
-    return vertices_.end();
+  inline typename std::vector<Vertex<T>>::const_iterator end() const {
+    return vertices_.get().end();
   }
 
-  inline typename std::vector<Vertex<T>>::const_iterator cbegin() const {
-    return vertices_.cbegin();
-  }
+  Vertex<T> operator[](size_t idx) { return vertices_.get()[idx]; }
 
-  inline typename std::vector<Vertex<T>>::const_iterator cend() const {
-    return vertices_.cend();
-  }
+  Vertex<T> operator[](size_t idx) const { return vertices_.get()[idx]; }
 
-  Vertex<T> operator[](size_t idx) { return vertices_[idx]; }
+  inline size_t size() const { return vertices_.get().size(); }
 
-  Vertex<T> operator[](size_t idx) const { return vertices_[idx]; }
-
-  inline size_t size() const { return vertices_.size(); }
-
-  void Swap(VertexVector& rhs) {
-    using std::swap;
-    swap(vertices_, rhs.vertices_);
-  }
+  void Swap(VertexVector& rhs) { std::swap(vertices_, rhs.vertices_); }
 
  private:
+  std::shared_ptr<const std::vector<Vertex<T>>> dummy;
   std::reference_wrapper<const std::vector<Vertex<T>>> vertices_;
 };
 
