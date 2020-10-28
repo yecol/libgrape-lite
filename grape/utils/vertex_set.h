@@ -23,94 +23,6 @@ limitations under the License.
 
 namespace grape {
 /**
- * @brief A discontinuous vertices collection representation. An increasing
- * labeled(but no need to be continuous) vertices must be provided to construct
- * the SparseVertexSet.
- *
- * @tparam T Vertex ID type.
- */
-template <typename VID_T>
-class SparseVertexSet {
- public:
-  SparseVertexSet() = default;
-
-  explicit SparseVertexSet(std::vector<Vertex<VID_T>>& vertices)
-      : vertices_(vertices) {
-    // verify increasing order
-    if (vertices.size() > 0) {
-      auto prev = vertices[0];
-      for (auto curr : vertices) {
-        CHECK_LE(prev.GetValue(), curr.GetValue());
-        prev = curr;
-      }
-    }
-  }
-
-  inline typename std::vector<Vertex<VID_T>>::iterator begin() {
-    return vertices_.begin();
-  }
-
-  inline typename std::vector<Vertex<VID_T>>::iterator end() {
-    return vertices_.end();
-  }
-
-  inline typename std::vector<Vertex<VID_T>>::const_iterator cbegin() const {
-    return vertices_.cbegin();
-  }
-
-  inline typename std::vector<Vertex<VID_T>>::const_iterator cend() const {
-    return vertices_.cend();
-  }
-
-  void Insert(Vertex<VID_T> u) { InsertWithRet(u); }
-
-  bool InsertWithRet(Vertex<VID_T> u) {
-    auto it = std::lower_bound(vertices_.begin(), vertices_.end(), u);
-
-    if (it == vertices_.end()) {
-      vertices_.push_back(u);
-      return true;
-    }
-
-    if (*it != u) {
-      vertices_.insert(it, u);
-      return true;
-    }
-
-    return false;
-  }
-
-  void Erase(Vertex<VID_T> u) { EraseWithRet(u); }
-
-  bool EraseWithRet(Vertex<VID_T> u) {
-    auto it = std::lower_bound(vertices_.begin(), vertices_.end(), u);
-
-    if (it == vertices_.end()) {
-      return false;
-    }
-
-    if (*it == u) {
-      vertices_.erase(it);
-      return true;
-    }
-    return false;
-  }
-
-  Vertex<VID_T> operator[](size_t idx) { return vertices_[idx]; }
-
-  Vertex<VID_T> operator[](size_t idx) const { return vertices_[idx]; }
-
-  inline size_t size() const { return vertices_.size(); }
-
-  void Swap(SparseVertexSet& rhs) {
-    using std::swap;
-    swap(vertices_, rhs.vertices_);
-  }
-
- private:
-  std::vector<Vertex<VID_T>> vertices_;
-};
-/**
  * @brief A vertex set with dense vertices.
  *
  * @tparam VID_T Vertex ID type.
@@ -138,7 +50,7 @@ class DenseVertexSet {
     }
   }
 
-  void Init(const SparseVertexSet<VID_T>& vertices, int thread_num = 1) {
+  void Init(const VertexVector<VID_T>& vertices, int thread_num = 1) {
     if (vertices.size() == 0)
       return;
     beg_ = vertices[0].GetValue();
