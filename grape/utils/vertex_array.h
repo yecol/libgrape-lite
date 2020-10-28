@@ -165,8 +165,7 @@ template <typename T>
 class VertexVector {
  public:
   VertexVector()
-      : dummy(std::make_shared<const std::vector<Vertex<T>>>()),
-        vertices_(*dummy) {}
+      : vertices_(dummy) {}
 
   explicit VertexVector(const std::vector<Vertex<T>>& vertices)
       : vertices_(vertices) {}
@@ -188,7 +187,7 @@ class VertexVector {
   void Swap(VertexVector& rhs) { std::swap(vertices_, rhs.vertices_); }
 
  private:
-  std::shared_ptr<const std::vector<Vertex<T>>> dummy;
+  std::vector<Vertex<T>> dummy;
   std::reference_wrapper<const std::vector<Vertex<T>>> vertices_;
 };
 
