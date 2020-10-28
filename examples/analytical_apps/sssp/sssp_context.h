@@ -45,8 +45,8 @@ class SSSPContext : public VertexDataContext<FRAG_T, double> {
 
     this->source_id = source_id;
     partial_result.SetValue(std::numeric_limits<double>::max());
-    curr_modified.init(frag.GetVerticesNum());
-    next_modified.init(frag.GetVerticesNum());
+    curr_modified.Init(frag.Vertices());
+    next_modified.Init(frag.Vertices());
 
 #ifdef PROFILING
     preprocess_time = 0;
@@ -80,7 +80,7 @@ class SSSPContext : public VertexDataContext<FRAG_T, double> {
   oid_t source_id;
   typename FRAG_T::template vertex_array_t<double>& partial_result;
 
-  Bitset curr_modified, next_modified;
+  DenseVertexSet<vid_t> curr_modified, next_modified;
 
 #ifdef PROFILING
   double preprocess_time = 0;

@@ -37,8 +37,8 @@ class WCCContext : public VertexDataContext<FRAG_T, typename FRAG_T::vid_t> {
   void Init(ParallelMessageManager& messages) {
     auto &frag = this->fragment();
 
-    curr_modified.init(frag.GetVerticesNum());
-    next_modified.init(frag.GetVerticesNum());
+    curr_modified.Init(frag.Vertices());
+    next_modified.Init(frag.Vertices());
   }
 
   void Output(std::ostream& os) override {
@@ -56,7 +56,7 @@ class WCCContext : public VertexDataContext<FRAG_T, typename FRAG_T::vid_t> {
 
   typename FRAG_T::template vertex_array_t<vid_t>& comp_id;
 
-  Bitset curr_modified, next_modified;
+  DenseVertexSet<vid_t> curr_modified, next_modified;
 
 #ifdef PROFILING
   double preprocess_time = 0;

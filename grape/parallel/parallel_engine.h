@@ -374,7 +374,8 @@ class ParallelEngine {
   }
 
   template <typename ITER_FUNC_T, typename VID_T>
-  inline void ForEach(const Bitset& bitset, const VertexRange<VID_T>& range,
+  inline void ForEach(const DenseVertexSet<VID_T>& dense_set,
+                      const VertexRange<VID_T>& range,
                       const ITER_FUNC_T& iter_func, int chunk_size = 1024) {
     std::vector<std::thread> threads(thread_num_);
 
@@ -388,7 +389,7 @@ class ParallelEngine {
       Vertex<VID_T> v(origin_begin);
       Vertex<VID_T> end(origin_end);
       while (v != end) {
-        if (bitset.get_bit(v.GetValue())) {
+        if (dense_set.Exist(v)) {
           iter_func(0, v);
         }
         ++v;
@@ -397,11 +398,12 @@ class ParallelEngine {
     }
 
     std::atomic<VID_T> cur(batch_begin);
+    auto& bitset = dense_set.GetBitset();
 
     for (uint32_t i = 0; i < thread_num_; ++i) {
       threads[i] = std::thread(
           [&iter_func, &cur, chunk_size, &bitset, batch_begin, batch_end,
-           origin_begin, origin_end, this](uint32_t tid) {
+              origin_begin, origin_end, this](uint32_t tid) {
             if (tid == 0 && origin_begin < batch_begin) {
               Vertex<VID_T> v(origin_begin);
               Vertex<VID_T> end(batch_begin);

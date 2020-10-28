@@ -34,8 +34,6 @@ class ContextBase {
   ContextBase() = default;
   virtual ~ContextBase() = default;
 
-  virtual const char* context_type() const = 0;
-
   /**
    * @brief Output function to implement for result output.
    * @note: This pure virtual function works as an interface, instructing users

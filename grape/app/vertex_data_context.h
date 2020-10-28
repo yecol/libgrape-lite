@@ -19,8 +19,6 @@ limitations under the License.
 #include "grape/app/context_base.h"
 #include "grape/utils/vertex_array.h"
 
-#define CONTEXT_TYPE_VERTEX_DATA "vertex_data"
-
 namespace grape {
 
 template <typename FRAG_T, typename DATA_T>
@@ -43,8 +41,6 @@ class VertexDataContext : public ContextBase {
   }
 
   const fragment_t& fragment() { return fragment_; }
-
-  const char* context_type() const override { return CONTEXT_TYPE_VERTEX_DATA; }
 
   inline vertex_array_t& data() { return data_; }
 
