@@ -29,6 +29,9 @@ class VertexDataContext : public ContextBase {
 
  public:
   using data_t = DATA_T;
+  static_assert(std::is_pod<data_t>::value ||
+                    std::is_same<data_t, std::string>::value,
+                "Unsupported data type");
 
   explicit VertexDataContext(const fragment_t& fragment,
                              bool including_outer = false)
