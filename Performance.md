@@ -18,7 +18,7 @@ We made minor changes on their code and datasets:
 The results are reported below. The numbers in the table represent the evaluation time in seconds. 
 The best results are marked in **bold**.
 
-| Algorithm |     Dataset    |      PowerGraph     |       libgrape-lite     |
+| Algorithm |     Dataset    |      PowerGraph     |       GraphScope     |
 |-----------|----------------|---------------------|-----------------------|
 |    SSSP   | datagen-9_0-fb |        6.48         |    **0.52**           |
 |    WCC    | datagen-9_0-fb |        16.99        |         **0.52**           |
