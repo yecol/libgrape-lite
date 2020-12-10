@@ -18,14 +18,14 @@ We made minor changes on their code and datasets:
 The results are reported below. The numbers in the table represent the evaluation time in seconds. 
 The best results are marked in **bold**.
 
-| Algorithm |     Dataset    |      PowerGraph     |     GeminiGraph     |      Plato      |     libgrape-lite     |
-|-----------|----------------|---------------------|---------------------|-----------------|-----------------------|
-|    SSSP   | datagen-9_0-fb |        6.48         |        0.74         |  N/A  |        **0.52**           |
-|    WCC    | datagen-9_0-fb |        16.99        |        1.05         |       2.85      |        **0.52**           |
-|    BFS    | datagen-9_0-fb |        4.31         |        0.38         |      0.73       |        **0.23**           |
-|  PageRank | datagen-9_0-fb |        26.90        |  X    |      X   |    **1.61**    |
-|    CDLP   | datagen-9_0-fb |        1535.09      |  N/A    |     16.67   |    **8.49**    |
-|    LCC    | datagen-9_0-fb |        453.07       |      N/A            |      N/A      |         **16.53**       |
+| Algorithm |     Dataset    |      PowerGraph     |       libgrape-lite     |
+|-----------|----------------|---------------------|-----------------------|
+|    SSSP   | datagen-9_0-fb |        6.48         |    **0.52**           |
+|    WCC    | datagen-9_0-fb |        16.99        |         **0.52**           |
+|    BFS    | datagen-9_0-fb |        4.31         |        **0.23**           |
+|  PageRank | datagen-9_0-fb |        26.90        |     **1.61**    |
+|    CDLP   | datagen-9_0-fb |        1535.09      |    **8.49**    |
+|    LCC    | datagen-9_0-fb |        453.07       |         **16.53**       |
 
 
 We used “default” code provided by the competitor systems when it is available. 
