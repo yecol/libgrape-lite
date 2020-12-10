@@ -21,23 +21,11 @@ The best results are marked in **bold**.
 | Algorithm |     Dataset    |      PowerGraph     |     GeminiGraph     |      Plato      |     libgrape-lite     |
 |-----------|----------------|---------------------|---------------------|-----------------|-----------------------|
 |    SSSP   | datagen-9_0-fb |        6.48         |        0.74         |  N/A  |        **0.52**           |
-|           | datagen-9_1-fb |        7.14         |        0.99         |  N/A  |        **0.62**           |
-|           | datagen-9_2-zf |        59.48        |        3.50         |  N/A  |        **1.85**           |
 |    WCC    | datagen-9_0-fb |        16.99        |        1.05         |       2.85      |        **0.52**           |
-|           | datagen-9_1-fb |        30.33        |        1.24         |       3.80      |        **0.60**           |
-|           | datagen-9_2-zf |        231.79       |        6.58         |       30.79     |        **1.77**           |
 |    BFS    | datagen-9_0-fb |        4.31         |        0.38         |      0.73       |        **0.23**           |
-|           | datagen-9_1-fb |        5.23         |        0.39         |      0.84       |        **0.26**           |
-|           | datagen-9_2-zf |        41.36        |        2.59         |      14.59      |        **1.64**           |
 |  PageRank | datagen-9_0-fb |        26.90        |  X    |      X   |    **1.61**    |
-|           | datagen-9_1-fb |        34.01        |  X    |      X   |    **1.99**    |
-|           | datagen-9_2-zf |        152.11       |  X    |      X   |    **4.00**    |
 |    CDLP   | datagen-9_0-fb |        1535.09      |  N/A    |     16.67   |    **8.49**    |
-|           | datagen-9_1-fb |        2725.54      |  N/A    |     21.60   |    **10.78**   |
-|           | datagen-9_2-zf |        > 3600       |  N/A    |     46.05   |    **17.17**   |
 |    LCC    | datagen-9_0-fb |        453.07       |      N/A            |      N/A      |         **16.53**       |
-|           | datagen-9_1-fb |        613.64       |      N/A            |      N/A      |         **20.83**       |
-|           | datagen-9_2-zf |        299.42       |      N/A            |      N/A      |         **19.81**       |
 
 
 We used “default” code provided by the competitor systems when it is available. 
