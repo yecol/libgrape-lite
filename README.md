@@ -12,6 +12,10 @@
 
 **libgrape-lite** is a C++ library from Alibaba for parallel graph processing. It differs from prior systems in its ability to parallelize sequential graph algorithms as a whole by following the *PIE* programming model from [GRAPE](https://dl.acm.org/doi/10.1145/3035918.3035942). Sequential algorithms can be easily ["plugged into"](examples/analytical_apps/sssp/sssp_auto.h) libgrape-lite with only minor changes and get parallelized to handle large graphs efficiently. In addition to the ease of programming, libgrape-lite is designed to be highly [efficient](Performance.md) and [flexible](examples/gnn_sampler), to cope the scale, variety and complexity from real-life graph applications.
 
+<a href="https://github.com/alibaba/GraphScope"><img width="300" alt="gs-badge-cowork" src="https://user-images.githubusercontent.com/426463/165910265-3659a912-4243-4a50-a70e-94a8e9d56d43.png"></a>
+
+
+
 ## Building **libgrape-lite**
 
 ### Dependencies
